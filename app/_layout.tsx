@@ -1,20 +1,36 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { initializeDatabase } from '@/database';
 import { colors } from '@/theme';
 
 // Prevent splash screen from auto-hiding before initialization completes
-SplashScreen.preventAutoHideAsync().catch(() => {
-  // Splash screen might already be hidden or unavailable in some environments
-});
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
+  const [dbReady, setDbReady] = useState(false);
+
   useEffect(() => {
-    // Hide splash screen after root layout mounts
-    SplashScreen.hideAsync().catch(() => {});
+    async function prepare() {
+      try {
+        await initializeDatabase();
+        setDbReady(true);
+      } catch (e) {
+        console.warn('Database initialization warning:', e);
+        setDbReady(true);
+      } finally {
+        await SplashScreen.hideAsync().catch(() => {});
+      }
+    }
+
+    prepare();
   }, []);
+
+  if (!dbReady) {
+    return null;
+  }
 
   return (
     <SafeAreaProvider>
