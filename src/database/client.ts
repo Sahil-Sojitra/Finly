@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { openDatabaseSync, SQLiteDatabase } from 'expo-sqlite';
 import { drizzle, ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 import { schema } from './schema';
@@ -13,8 +14,10 @@ let drizzleDb: ExpoSQLiteDatabase<typeof schema> | null = null;
 export function getNativeDatabase(): SQLiteDatabase {
   if (!nativeDb) {
     nativeDb = openDatabaseSync(DB_NAME);
-    // Explicitly enforce foreign key constraints
-    nativeDb.execSync('PRAGMA foreign_keys = ON;');
+    // Explicitly enforce foreign key constraints on native platforms
+    if (Platform.OS !== 'web') {
+      nativeDb.execSync('PRAGMA foreign_keys = ON;');
+    }
   }
   return nativeDb;
 }

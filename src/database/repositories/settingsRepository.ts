@@ -5,10 +5,14 @@ import { appSettings } from '../schema';
 type DbInstance = ReturnType<typeof getDatabase>;
 
 export class SettingsRepository {
-  private db: DbInstance;
+  private customDb?: DbInstance;
 
   constructor(customDb?: DbInstance) {
-    this.db = customDb ?? getDatabase();
+    this.customDb = customDb;
+  }
+
+  private get db(): DbInstance {
+    return this.customDb ?? getDatabase();
   }
 
   async get(key: string): Promise<string | null> {

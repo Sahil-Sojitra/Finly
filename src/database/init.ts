@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { getNativeDatabase, getDatabase } from './client';
 import { categories, appSettings } from './schema';
 import { DEFAULT_CATEGORIES } from './seeds';
@@ -68,9 +69,13 @@ CREATE INDEX IF NOT EXISTS idx_salary_cycles_received_date ON salary_cycles(rece
  * Executes initial table and index creation, PRAGMA checks, and seeds default categories.
  */
 export async function initializeDatabase(): Promise<void> {
-  const rawDb = getNativeDatabase();
+  if (Platform.OS === 'web') {
+    // In web previews, native SQLite operations are bypassed
+    return;
+  }
 
-  // Execute schema creation scripts
+  const rawDb = getNativeDatabase();
+  // Execute schema creation scripts on native mobile platforms
   rawDb.execSync(INIT_SQL);
 
   const db = getDatabase();

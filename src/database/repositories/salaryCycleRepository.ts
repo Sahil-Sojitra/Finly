@@ -6,10 +6,14 @@ import { Paise, SalaryCycle } from '@/types';
 type DbInstance = ReturnType<typeof getDatabase>;
 
 export class SalaryCycleRepository {
-  private db: DbInstance;
+  private customDb?: DbInstance;
 
   constructor(customDb?: DbInstance) {
-    this.db = customDb ?? getDatabase();
+    this.customDb = customDb;
+  }
+
+  private get db(): DbInstance {
+    return this.customDb ?? getDatabase();
   }
 
   async getAll(): Promise<SalaryCycle[]> {
