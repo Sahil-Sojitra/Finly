@@ -5,7 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { initializeDatabase } from '@/database';
-import { WidgetService } from '@/services';
+import { WidgetService, BackupService } from '@/services';
 import { colors } from '@/theme';
 
 // Prevent splash screen from auto-hiding before initialization completes
@@ -21,6 +21,8 @@ export default function RootLayout() {
         setDbReady(true);
         // Synchronize widget snapshot on startup
         WidgetService.syncFromDatabase().catch(() => {});
+        // Check and trigger scheduled backup in the background
+        BackupService.checkAndRunScheduledBackup().catch(() => {});
       } catch (e) {
         console.warn('Database initialization warning:', e);
         setDbReady(true);
@@ -83,6 +85,12 @@ export default function RootLayout() {
           options={{
             title: 'New Salary Cycle',
             presentation: 'modal',
+          }}
+        />
+        <Stack.Screen
+          name="backup/index"
+          options={{
+            headerShown: false,
           }}
         />
       </Stack>

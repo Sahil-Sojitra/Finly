@@ -1,9 +1,34 @@
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { WidgetPreviewCard } from '@/features/widgets';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { useBackupStore } from '@/store';
+import { useEffect } from 'react';
 
 export default function SettingsScreen() {
+  const router = useRouter();
+  const { isSignedIn, lastBackupTime, loadBackupState } = useBackupStore();
+
+  useEffect(() => {
+    loadBackupState();
+  }, [loadBackupState]);
+
+  const formatLastBackup = (iso: string | null) => {
+    if (!iso) return 'Never backed up';
+    try {
+      const d = new Date(iso);
+      return d.toLocaleDateString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+      });
+    } catch {
+      return 'Never';
+    }
+  };
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       {/* App Info Card */}
@@ -22,6 +47,41 @@ export default function SettingsScreen() {
         </Text>
       </View>
 
+      {/* Cloud Backup & Recovery Entry Point */}
+      <TouchableOpacity
+        style={styles.backupCard}
+        onPress={() => router.push('/backup' as never)}
+        activeOpacity={0.8}
+      >
+        <View style={styles.backupIconCircle}>
+          <Ionicons name="cloud-upload" size={22} color={colors.primary} />
+        </View>
+        <View style={styles.backupTextCol}>
+          <View style={styles.backupTitleRow}>
+            <Text style={styles.backupTitle}>Cloud Backup & Recovery</Text>
+            <View
+              style={[
+                styles.backupStatusBadge,
+                isSignedIn ? styles.badgeActive : styles.badgeOffline,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.backupStatusBadgeText,
+                  isSignedIn ? styles.badgeTextActive : styles.badgeTextOffline,
+                ]}
+              >
+                {isSignedIn ? 'Connected' : 'Offline'}
+              </Text>
+            </View>
+          </View>
+          <Text style={styles.backupSubtitle}>
+            Google Drive appDataFolder • Last: {formatLastBackup(lastBackupTime)}
+          </Text>
+        </View>
+        <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
+      </TouchableOpacity>
+
       {/* Widget Preview & Sync Card */}
       <WidgetPreviewCard />
 
@@ -33,6 +93,9 @@ export default function SettingsScreen() {
         </View>
         <Text style={styles.cardBody}>
           • Local-First: All transaction records are stored on-device in SQLite.
+        </Text>
+        <Text style={styles.cardBody}>
+          • Zero-Knowledge Backup: AES-256-GCM encrypted with your recovery passphrase.
         </Text>
         <Text style={styles.cardBody}>
           • Offline-Ready: Speech recognition and analytics run without external API subscriptions.
@@ -89,6 +152,65 @@ const styles = StyleSheet.create({
     ...typography.bodyMedium,
     color: colors.textSecondary,
     lineHeight: 20,
+  },
+  backupCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    padding: spacing.lg,
+    borderRadius: radii.xl,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: spacing.md,
+    ...shadows.sm,
+  },
+  backupIconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#EFF6FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.md,
+  },
+  backupTextCol: {
+    flex: 1,
+  },
+  backupTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  backupTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.textPrimary,
+  },
+  backupSubtitle: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  backupStatusBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 10,
+  },
+  badgeActive: {
+    backgroundColor: '#DCFCE7',
+  },
+  badgeOffline: {
+    backgroundColor: '#F1F5F9',
+  },
+  backupStatusBadgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  badgeTextActive: {
+    color: colors.success,
+  },
+  badgeTextOffline: {
+    color: colors.textTertiary,
   },
   card: {
     backgroundColor: colors.surface,
