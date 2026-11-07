@@ -8,9 +8,16 @@
     "scheme": "finly",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "primaryColor": "#2563EB",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.finly.app"
+      "bundleIdentifier": "com.finly.app",
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Finly requires microphone access to record voice transactions.",
+        "NSSpeechRecognitionUsageDescription": "Finly uses speech recognition to parse natural language expense and income details.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -20,6 +27,14 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "package": "com.finly.app",
+      "versionCode": 1,
+      "permissions": [
+        "RECORD_AUDIO",
+        "POST_NOTIFICATIONS",
+        "INTERNET",
+        "VIBRATE",
+        "RECEIVE_BOOT_COMPLETED"
+      ],
       "predictiveBackGestureEnabled": false
     },
     "web": {
