@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { WidgetPreviewCard } from '@/features/widgets';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
@@ -34,9 +34,7 @@ export default function SettingsScreen() {
       {/* App Info Card */}
       <View style={styles.infoCard}>
         <View style={styles.logoRow}>
-          <View style={styles.logoBox}>
-            <Ionicons name="wallet" size={24} color="#FFFFFF" />
-          </View>
+          <Image source={require('../../assets/images/icon.png')} style={styles.logoBox} resizeMode="contain" />
           <View>
             <Text style={styles.appTitle}>Finly</Text>
             <Text style={styles.versionText}>Version 1.0.0 • Local-First Personal Finance</Text>
