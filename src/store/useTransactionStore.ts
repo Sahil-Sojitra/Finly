@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { TransactionWithCategory, Paise, Transaction } from '@/types';
 import { TransactionRepository } from '@/database/repositories/transactionRepository';
+import { WidgetService } from '@/services/widgetService';
+
 
 interface TransactionState {
   transactions: TransactionWithCategory[];
@@ -41,6 +43,8 @@ export const useTransactionStore = create<TransactionState>((set, get) => ({
       // Refresh list to pull full joined category details
       const items = await repository.getAll();
       set({ transactions: items, isLoading: false });
+      // Synchronize native widget snapshot
+      WidgetService.syncFromDatabase().catch(() => {});
       return created;
     } catch (err) {
       set({
@@ -60,6 +64,8 @@ export const useTransactionStore = create<TransactionState>((set, get) => ({
           transactions: state.transactions.filter((tx) => tx.id !== id),
           isLoading: false,
         }));
+        // Synchronize native widget snapshot
+        WidgetService.syncFromDatabase().catch(() => {});
       }
       return success;
     } catch (err) {

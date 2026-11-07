@@ -3,7 +3,10 @@ import { Paise, SalaryCycle } from '@/types';
 import { SalaryCycleRepository } from '@/database/repositories/salaryCycleRepository';
 import { TransactionRepository } from '@/database/repositories/transactionRepository';
 import { MultiCycleEvaluation, SalaryCycleEngine } from '@/domain/salaryCycleEngine';
+import { WidgetSnapshotSerializer } from '@/domain/widgetSnapshot';
+import { WidgetService } from '@/services/widgetService';
 import * as Crypto from 'expo-crypto';
+
 
 interface SalaryCycleState {
   cycles: SalaryCycle[];
@@ -52,6 +55,14 @@ export const useSalaryCycleStore = create<SalaryCycleState>((set, get) => ({
         evaluation,
         isLoading: false,
       });
+
+      // Synchronize native home screen widget snapshot
+      const snapshot = WidgetSnapshotSerializer.createSnapshot({
+        cycles: rawCycles,
+        transactions: allTx,
+        evaluation,
+      });
+      WidgetService.pushSnapshot(snapshot).catch(() => {});
     } catch (err) {
       set({
         error: err instanceof Error ? err.message : 'Failed to fetch salary cycles',
