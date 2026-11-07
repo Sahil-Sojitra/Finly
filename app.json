@@ -35,7 +35,14 @@
           "imageWidth": 120
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Finly needs access to your microphone to record voice expenses.",
+          "speechRecognitionPermission": "Finly uses speech recognition to transcribe natural language expense and income commands."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
