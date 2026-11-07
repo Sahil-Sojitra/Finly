@@ -52,4 +52,5 @@ coverage/
 example/
 .vscode/
 
-.docs/
+# Local documentation (excluded from version control / production)
+docs/
