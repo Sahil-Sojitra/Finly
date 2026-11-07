@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';
 import { colors } from '@/theme';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function TabLayout() {
   return (
@@ -29,6 +30,13 @@ export default function TabLayout() {
         options={{
           title: 'Dashboard',
           headerTitle: 'Finly',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'pie-chart' : 'pie-chart-outline'}
+              size={22}
+              color={color as string}
+            />
+          ),
         }}
       />
       <Tabs.Screen
@@ -36,6 +44,13 @@ export default function TabLayout() {
         options={{
           title: 'Transactions',
           headerTitle: 'Transactions',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'receipt' : 'receipt-outline'}
+              size={22}
+              color={color as string}
+            />
+          ),
         }}
       />
       <Tabs.Screen
@@ -43,6 +58,13 @@ export default function TabLayout() {
         options={{
           title: 'Salary Cycles',
           headerTitle: 'Salary Cycles',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'calendar' : 'calendar-outline'}
+              size={22}
+              color={color as string}
+            />
+          ),
         }}
       />
       <Tabs.Screen
@@ -50,8 +72,17 @@ export default function TabLayout() {
         options={{
           title: 'Settings',
           headerTitle: 'Settings',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'settings' : 'settings-outline'}
+              size={22}
+              color={color as string}
+            />
+          ),
         }}
       />
+
     </Tabs>
   );
 }
+
