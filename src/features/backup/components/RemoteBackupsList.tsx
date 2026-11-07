@@ -1,6 +1,7 @@
+import { useMemo } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, radii, shadows, spacing } from '@/theme';
+import { radii, shadows, spacing, useTheme, ThemeColors } from '@/theme';
 import { DriveBackupItem } from '@/domain/backup/backupTypes';
 
 interface RemoteBackupsListProps {
@@ -18,6 +19,9 @@ export function RemoteBackupsList({
   onSelectBackup,
   disabled,
 }: RemoteBackupsListProps) {
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
+
   const formatFileSize = (bytes: number) => {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -100,124 +104,121 @@ export function RemoteBackupsList({
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.lg,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    ...shadows.sm,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing.md,
-  },
-  headerTitleCol: {
-    flex: 1,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  cardSubtitle: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  refreshButton: {
-    padding: 6,
-    borderRadius: 8,
-    backgroundColor: '#EFF6FF',
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    paddingVertical: spacing.xl,
-    borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
-  },
-  emptyTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginTop: spacing.sm,
-  },
-  emptySubtitle: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginTop: 4,
-    maxWidth: 240,
-  },
-  listContainer: {
-    borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
-    paddingTop: spacing.sm,
-    gap: 8,
-  },
-  backupRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
-  },
-  fileIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#EFF6FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.sm,
-  },
-  backupDetailsCol: {
-    flex: 1,
-  },
-  backupDate: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
-  badgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 2,
-  },
-  backupSize: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  dot: {
-    width: 3,
-    height: 3,
-    borderRadius: 1.5,
-    backgroundColor: colors.textTertiary,
-  },
-  encryptedBadge: {
-    fontSize: 12,
-    color: colors.primary,
-    fontWeight: '500',
-  },
-  restoreRowButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: radii.sm,
-    backgroundColor: '#EFF6FF',
-    borderWidth: 1,
-    borderColor: '#BFDBFE',
-    gap: 4,
-  },
-  restoreRowButtonText: {
-    color: colors.primary,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-});
+const getStyles = (colors: ThemeColors, isDark: boolean) =>
+  StyleSheet.create({
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radii.lg,
+      padding: spacing.lg,
+      marginBottom: spacing.md,
+      ...shadows.sm,
+      borderWidth: 1,
+      borderColor: colors.borderLight,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    headerTitleCol: {
+      flex: 1,
+    },
+    cardTitle: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    cardSubtitle: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    refreshButton: {
+      padding: spacing.xs,
+    },
+    emptyContainer: {
+      alignItems: 'center',
+      paddingVertical: spacing.xl,
+    },
+    emptyTitle: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      marginTop: spacing.sm,
+    },
+    emptySubtitle: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginTop: 4,
+      maxWidth: 240,
+    },
+    listContainer: {
+      borderTopWidth: 1,
+      borderTopColor: colors.borderLight,
+      paddingTop: spacing.sm,
+      gap: 8,
+    },
+    backupRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.borderLight,
+    },
+    fileIconCircle: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: isDark ? colors.surfaceSecondary : '#EFF6FF',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: spacing.sm,
+    },
+    backupDetailsCol: {
+      flex: 1,
+    },
+    backupDate: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.textPrimary,
+    },
+    badgeRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      marginTop: 2,
+    },
+    backupSize: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
+    dot: {
+      width: 3,
+      height: 3,
+      borderRadius: 1.5,
+      backgroundColor: colors.textTertiary,
+    },
+    encryptedBadge: {
+      fontSize: 12,
+      color: colors.primary,
+      fontWeight: '500',
+    },
+    restoreRowButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: radii.sm,
+      backgroundColor: isDark ? colors.surfaceSecondary : '#EFF6FF',
+      borderWidth: 1,
+      borderColor: isDark ? colors.border : '#BFDBFE',
+      gap: 4,
+    },
+    restoreRowButtonText: {
+      color: colors.primary,
+      fontSize: 12,
+      fontWeight: '700',
+    },
+  });

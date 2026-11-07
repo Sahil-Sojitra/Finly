@@ -13,12 +13,15 @@ import { useTransactionStore, useSalaryCycleStore } from '@/store';
 import { VoiceRecordingModal } from '@/features/voice';
 import { formatDisplayDate } from '@/domain/dateUtils';
 import { formatPaiseToInr } from '@/utils';
-import { colors, radii, shadows, spacing, typography } from '@/theme';
+import { radii, shadows, spacing, typography, useTheme, ThemeColors } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { TransactionType } from '@/types';
 
 export default function TransactionsScreen() {
   const router = useRouter();
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
+
   const [filterType, setFilterType] = useState<TransactionType | 'all'>('all');
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
 
@@ -133,7 +136,7 @@ export default function TransactionsScreen() {
                   <View
                     style={[
                       styles.categoryBadge,
-                      { backgroundColor: (tx.category?.color ?? colors.primary) + '20' },
+                      { backgroundColor: (tx.category?.color ?? colors.primary) + (isDark ? '33' : '20') },
                     ]}
                   >
                     <Ionicons
@@ -198,175 +201,176 @@ export default function TransactionsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  screenWrapper: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  topBar: {
-    flexDirection: 'row',
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
-    gap: spacing.sm,
-  },
-  voiceQuickButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.accent,
-    paddingVertical: spacing.sm + 2,
-    borderRadius: radii.xl,
-    gap: 6,
-    ...shadows.sm,
-  },
-  voiceQuickButtonText: {
-    ...typography.bodyMedium,
-    color: '#FFFFFF',
-    fontWeight: '700',
-  },
-  addQuickButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.primary,
-    paddingVertical: spacing.sm + 2,
-    borderRadius: radii.xl,
-    gap: 6,
-    ...shadows.sm,
-  },
-  addQuickButtonText: {
-    ...typography.bodyMedium,
-    color: '#FFFFFF',
-    fontWeight: '700',
-  },
-  filterPillsRow: {
-    flexDirection: 'row',
-    backgroundColor: colors.surfaceSecondary,
-    marginHorizontal: spacing.md,
-    marginVertical: spacing.md,
-    borderRadius: radii.full,
-    padding: 3,
-  },
-  filterPill: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 6,
-    borderRadius: radii.full,
-  },
-  activeFilterPill: {
-    backgroundColor: colors.surface,
-    ...shadows.sm,
-  },
-  filterPillText: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
-  activeFilterPillText: {
-    color: colors.textPrimary,
-    fontWeight: '700',
-  },
-  container: {
-    flex: 1,
-  },
-  contentContainer: {
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.xxl,
-  },
-  listContainer: {
-    gap: spacing.sm,
-  },
-  txCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    padding: spacing.md,
-    borderRadius: radii.xl,
-    borderWidth: 1,
-    borderColor: colors.border,
-    gap: spacing.md,
-    ...shadows.sm,
-  },
-  categoryBadge: {
-    width: 44,
-    height: 44,
-    borderRadius: radii.lg,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  txInfoCol: {
-    flex: 1,
-  },
-  descRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  txDescription: {
-    ...typography.bodyMedium,
-    color: colors.textPrimary,
-    fontWeight: '700',
-    flexShrink: 1,
-  },
-  voiceBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#EEF2FF',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: radii.full,
-    gap: 2,
-  },
-  voiceBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.accent,
-  },
-  txMetaText: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  txRightCol: {
-    alignItems: 'flex-end',
-    gap: 6,
-  },
-  txAmount: {
-    ...typography.bodyLarge,
-    fontWeight: '800',
-  },
-  incomeText: {
-    color: colors.success,
-  },
-  expenseText: {
-    color: colors.danger,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    paddingVertical: spacing.xxl,
-    gap: spacing.xs,
-  },
-  emptyIconBox: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: colors.surfaceSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  emptyTitle: {
-    ...typography.headingSmall,
-    color: colors.textPrimary,
-  },
-  emptySubtitle: {
-    ...typography.bodyMedium,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    maxWidth: 280,
-    lineHeight: 20,
-  },
-});
+const getStyles = (colors: ThemeColors, isDark: boolean) =>
+  StyleSheet.create({
+    screenWrapper: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    topBar: {
+      flexDirection: 'row',
+      paddingHorizontal: spacing.md,
+      paddingTop: spacing.md,
+      gap: spacing.sm,
+    },
+    voiceQuickButton: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.accent,
+      paddingVertical: spacing.sm + 2,
+      borderRadius: radii.xl,
+      gap: 6,
+      ...shadows.sm,
+    },
+    voiceQuickButtonText: {
+      ...typography.bodyMedium,
+      color: '#FFFFFF',
+      fontWeight: '700',
+    },
+    addQuickButton: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.primary,
+      paddingVertical: spacing.sm + 2,
+      borderRadius: radii.xl,
+      gap: 6,
+      ...shadows.sm,
+    },
+    addQuickButtonText: {
+      ...typography.bodyMedium,
+      color: '#FFFFFF',
+      fontWeight: '700',
+    },
+    filterPillsRow: {
+      flexDirection: 'row',
+      backgroundColor: colors.surfaceSecondary,
+      marginHorizontal: spacing.md,
+      marginVertical: spacing.md,
+      borderRadius: radii.full,
+      padding: 3,
+    },
+    filterPill: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 6,
+      borderRadius: radii.full,
+    },
+    activeFilterPill: {
+      backgroundColor: colors.surface,
+      ...shadows.sm,
+    },
+    filterPillText: {
+      ...typography.caption,
+      color: colors.textSecondary,
+      fontWeight: '600',
+    },
+    activeFilterPillText: {
+      color: colors.textPrimary,
+      fontWeight: '700',
+    },
+    container: {
+      flex: 1,
+    },
+    contentContainer: {
+      paddingHorizontal: spacing.md,
+      paddingBottom: spacing.xxl,
+    },
+    listContainer: {
+      gap: spacing.sm,
+    },
+    txCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      padding: spacing.md,
+      borderRadius: radii.xl,
+      borderWidth: 1,
+      borderColor: colors.border,
+      gap: spacing.md,
+      ...shadows.sm,
+    },
+    categoryBadge: {
+      width: 44,
+      height: 44,
+      borderRadius: radii.lg,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    txInfoCol: {
+      flex: 1,
+    },
+    descRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    },
+    txDescription: {
+      ...typography.bodyMedium,
+      color: colors.textPrimary,
+      fontWeight: '700',
+      flexShrink: 1,
+    },
+    voiceBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: isDark ? 'rgba(129, 140, 248, 0.2)' : '#EEF2FF',
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      borderRadius: radii.full,
+      gap: 2,
+    },
+    voiceBadgeText: {
+      fontSize: 10,
+      fontWeight: '700',
+      color: colors.accent,
+    },
+    txMetaText: {
+      ...typography.caption,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    txRightCol: {
+      alignItems: 'flex-end',
+      gap: 6,
+    },
+    txAmount: {
+      ...typography.bodyLarge,
+      fontWeight: '800',
+    },
+    incomeText: {
+      color: colors.success,
+    },
+    expenseText: {
+      color: colors.danger,
+    },
+    emptyContainer: {
+      alignItems: 'center',
+      paddingVertical: spacing.xxl,
+      gap: spacing.xs,
+    },
+    emptyIconBox: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      backgroundColor: colors.surfaceSecondary,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: spacing.sm,
+    },
+    emptyTitle: {
+      ...typography.headingSmall,
+      color: colors.textPrimary,
+    },
+    emptySubtitle: {
+      ...typography.bodyMedium,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      maxWidth: 280,
+      lineHeight: 20,
+    },
+  });

@@ -4,10 +4,11 @@ import { SmallWidgetLayout } from './SmallWidgetLayout';
 import { MediumWidgetLayout } from './MediumWidgetLayout';
 import { WidgetService } from '@/services/widgetService';
 import { WidgetSnapshotData, WidgetSnapshotSerializer } from '@/domain/widgetSnapshot';
-import { colors, radii, shadows, spacing, typography } from '@/theme';
+import { radii, shadows, spacing, typography, useTheme } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 
 export function WidgetPreviewCard() {
+  const { colors, isDark } = useTheme();
   const [snapshot, setSnapshot] = useState<WidgetSnapshotData>(
     WidgetSnapshotSerializer.createFallbackSnapshot()
   );
@@ -40,38 +41,38 @@ export function WidgetPreviewCard() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       {/* Header */}
       <View style={styles.headerRow}>
         <View style={styles.titleRow}>
           <Ionicons name="apps-outline" size={20} color={colors.primary} />
-          <Text style={styles.title}>Home Screen Widgets</Text>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Home Screen Widgets</Text>
         </View>
 
         <TouchableOpacity
-          style={styles.syncButton}
+          style={[styles.syncButton, { backgroundColor: colors.primaryLight }]}
           onPress={handleSyncNow}
           disabled={isSyncing}
           activeOpacity={0.7}
         >
           <Ionicons name="refresh" size={14} color={colors.primary} />
-          <Text style={styles.syncButtonText}>{isSyncing ? 'Syncing...' : 'Sync Widgets'}</Text>
+          <Text style={[styles.syncButtonText, { color: isDark ? '#93C5FD' : colors.primaryDark }]}>{isSyncing ? 'Syncing...' : 'Sync Widgets'}</Text>
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.description}>
+      <Text style={[styles.description, { color: colors.textSecondary }]}>
         Finly supports native Android AppWidgets and iOS WidgetKit. Widgets display live snapshots of your active salary cycle balance and spending.
       </Text>
 
       {/* Tabs */}
-      <View style={styles.tabRow}>
+      <View style={[styles.tabRow, { backgroundColor: colors.surfaceSecondary }]}>
         {(['both', 'small', 'medium'] as const).map((tab) => (
           <TouchableOpacity
             key={tab}
-            style={[styles.tabButton, activeTab === tab && styles.tabButtonActive]}
+            style={[styles.tabButton, activeTab === tab && [styles.tabButtonActive, { backgroundColor: colors.surface }]]}
             onPress={() => setActiveTab(tab)}
           >
-            <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
+            <Text style={[styles.tabText, { color: activeTab === tab ? colors.textPrimary : colors.textSecondary }]}>
               {tab === 'both' ? 'All Sizes' : tab === 'small' ? 'Small (2x2)' : 'Medium (4x2)'}
             </Text>
           </TouchableOpacity>
@@ -85,15 +86,15 @@ export function WidgetPreviewCard() {
         contentContainerStyle={styles.previewsScroll}
       >
         {(activeTab === 'both' || activeTab === 'small') && (
-          <View style={styles.previewBox}>
-            <Text style={styles.previewTag}>Small Widget (2x2)</Text>
+          <View style={[styles.previewBox, { backgroundColor: colors.surfaceSecondary, borderColor: colors.border }]}>
+            <Text style={[styles.previewTag, { color: colors.textSecondary }]}>Small Widget (2x2)</Text>
             <SmallWidgetLayout data={snapshot} />
           </View>
         )}
 
         {(activeTab === 'both' || activeTab === 'medium') && (
-          <View style={styles.previewBox}>
-            <Text style={styles.previewTag}>Medium Widget (4x2)</Text>
+          <View style={[styles.previewBox, { backgroundColor: colors.surfaceSecondary, borderColor: colors.border }]}>
+            <Text style={[styles.previewTag, { color: colors.textSecondary }]}>Medium Widget (4x2)</Text>
             <MediumWidgetLayout data={snapshot} />
           </View>
         )}
@@ -104,11 +105,9 @@ export function WidgetPreviewCard() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.surface,
     borderRadius: radii.xl,
     padding: spacing.lg,
     borderWidth: 1,
-    borderColor: colors.border,
     ...shadows.sm,
     marginVertical: spacing.sm,
   },
@@ -125,12 +124,10 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.headingSmall,
-    color: colors.textPrimary,
   },
   syncButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.primaryLight,
     paddingHorizontal: spacing.sm,
     paddingVertical: 5,
     borderRadius: radii.full,
@@ -138,18 +135,15 @@ const styles = StyleSheet.create({
   },
   syncButtonText: {
     ...typography.caption,
-    color: colors.primaryDark,
     fontWeight: '700',
   },
   description: {
     ...typography.bodyMedium,
-    color: colors.textSecondary,
     marginBottom: spacing.md,
     lineHeight: 20,
   },
   tabRow: {
     flexDirection: 'row',
-    backgroundColor: colors.surfaceSecondary,
     borderRadius: radii.full,
     padding: 3,
     marginBottom: spacing.md,
@@ -161,17 +155,11 @@ const styles = StyleSheet.create({
     borderRadius: radii.full,
   },
   tabButtonActive: {
-    backgroundColor: colors.surface,
     ...shadows.sm,
   },
   tabText: {
     ...typography.caption,
-    color: colors.textSecondary,
     fontWeight: '600',
-  },
-  tabTextActive: {
-    color: colors.textPrimary,
-    fontWeight: '700',
   },
   previewsScroll: {
     gap: spacing.md,
@@ -179,16 +167,13 @@ const styles = StyleSheet.create({
   },
   previewBox: {
     alignItems: 'center',
-    backgroundColor: colors.surfaceSecondary,
     padding: spacing.md,
     borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: colors.border,
     gap: spacing.sm,
   },
   previewTag: {
     ...typography.caption,
-    color: colors.textSecondary,
     fontWeight: '700',
   },
 });

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -16,13 +16,15 @@ import { useCategoryStore, useTransactionStore, useSalaryCycleStore } from '@/st
 import { DEFAULT_CATEGORIES } from '@/database/seeds/defaultCategories';
 import { VoiceRecordingModal } from '@/features/voice';
 import { parseInrToPaise } from '@/utils';
-import { colors, radii, shadows, spacing, typography } from '@/theme';
+import { radii, shadows, spacing, typography, useTheme, ThemeColors } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import * as Crypto from 'expo-crypto';
 import { TransactionType } from '@/types';
 
 export default function NewTransactionScreen() {
   const router = useRouter();
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
 
   const [type, setType] = useState<TransactionType>('expense');
   const [amount, setAmount] = useState('');
@@ -271,180 +273,181 @@ export default function NewTransactionScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  screenWrapper: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-  },
-  contentContainer: {
-    padding: spacing.md,
-    paddingBottom: spacing.xxl,
-  },
-  voicePromptCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#EFF6FF',
-    borderRadius: radii.xl,
-    padding: spacing.lg,
-    borderWidth: 1.5,
-    borderColor: '#93C5FD',
-    ...shadows.sm,
-    marginBottom: spacing.md,
-  },
-  voicePromptIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.md,
-  },
-  voicePromptTextCol: {
-    flex: 1,
-  },
-  voicePromptTitle: {
-    ...typography.headingSmall,
-    color: colors.primaryDark,
-    fontWeight: '700',
-  },
-  voicePromptSubtitle: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  orDivider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: spacing.sm,
-    gap: spacing.sm,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: colors.border,
-  },
-  dividerText: {
-    ...typography.caption,
-    color: colors.textTertiary,
-    fontWeight: '600',
-  },
-  typeToggleRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    marginVertical: spacing.md,
-  },
-  typeButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: spacing.md,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-    gap: 6,
-    ...shadows.sm,
-  },
-  typeButtonActiveExpense: {
-    backgroundColor: colors.danger,
-    borderColor: colors.danger,
-  },
-  typeButtonActiveIncome: {
-    backgroundColor: colors.success,
-    borderColor: colors.success,
-  },
-  typeButtonText: {
-    ...typography.bodyMedium,
-    fontWeight: '700',
-    color: colors.textSecondary,
-  },
-  typeButtonTextActive: {
-    color: '#FFFFFF',
-  },
-  formCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.xl,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: spacing.md,
-    ...shadows.sm,
-  },
-  fieldLabel: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    fontWeight: '600',
-    marginBottom: 6,
-  },
-  amountInputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  currencySymbol: {
-    ...typography.headingLarge,
-    color: colors.textSecondary,
-    fontWeight: '700',
-  },
-  amountInput: {
-    flex: 1,
-    ...typography.hero,
-    color: colors.textPrimary,
-    fontWeight: '800',
-  },
-  textInput: {
-    ...typography.bodyLarge,
-    color: colors.textPrimary,
-    paddingVertical: 4,
-  },
-  categoryPillsScroll: {
-    gap: spacing.xs,
-    paddingVertical: 4,
-  },
-  catPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surfaceSecondary,
-    paddingHorizontal: spacing.md,
-    paddingVertical: 8,
-    borderRadius: radii.full,
-    borderWidth: 1,
-    borderColor: colors.border,
-    gap: 6,
-  },
-  catDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  catPillText: {
-    ...typography.caption,
-    color: colors.textPrimary,
-    fontWeight: '600',
-  },
-  catPillTextActive: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-  },
-  saveButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.primary,
-    paddingVertical: spacing.md + 2,
-    borderRadius: radii.xl,
-    gap: spacing.xs,
-    marginTop: spacing.sm,
-    ...shadows.md,
-  },
-  saveButtonText: {
-    ...typography.bodyLarge,
-    color: '#FFFFFF',
-    fontWeight: '700',
-  },
-});
+const getStyles = (colors: ThemeColors, isDark: boolean) =>
+  StyleSheet.create({
+    screenWrapper: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+    },
+    contentContainer: {
+      padding: spacing.md,
+      paddingBottom: spacing.xxl,
+    },
+    voicePromptCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: isDark ? colors.surface : '#EFF6FF',
+      borderRadius: radii.xl,
+      padding: spacing.lg,
+      borderWidth: 1.5,
+      borderColor: isDark ? colors.border : '#93C5FD',
+      ...shadows.sm,
+      marginBottom: spacing.md,
+    },
+    voicePromptIcon: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: colors.primary,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: spacing.md,
+    },
+    voicePromptTextCol: {
+      flex: 1,
+    },
+    voicePromptTitle: {
+      ...typography.headingSmall,
+      color: isDark ? colors.textPrimary : colors.primaryDark,
+      fontWeight: '700',
+    },
+    voicePromptSubtitle: {
+      ...typography.caption,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    orDivider: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginVertical: spacing.sm,
+      gap: spacing.sm,
+    },
+    dividerLine: {
+      flex: 1,
+      height: 1,
+      backgroundColor: colors.border,
+    },
+    dividerText: {
+      ...typography.caption,
+      color: colors.textTertiary,
+      fontWeight: '600',
+    },
+    typeToggleRow: {
+      flexDirection: 'row',
+      gap: spacing.md,
+      marginVertical: spacing.md,
+    },
+    typeButton: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: spacing.md,
+      borderRadius: radii.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+      gap: 6,
+      ...shadows.sm,
+    },
+    typeButtonActiveExpense: {
+      backgroundColor: colors.danger,
+      borderColor: colors.danger,
+    },
+    typeButtonActiveIncome: {
+      backgroundColor: colors.success,
+      borderColor: colors.success,
+    },
+    typeButtonText: {
+      ...typography.bodyMedium,
+      fontWeight: '700',
+      color: colors.textSecondary,
+    },
+    typeButtonTextActive: {
+      color: '#FFFFFF',
+    },
+    formCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radii.xl,
+      padding: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: spacing.md,
+      ...shadows.sm,
+    },
+    fieldLabel: {
+      ...typography.caption,
+      color: colors.textSecondary,
+      fontWeight: '600',
+      marginBottom: 6,
+    },
+    amountInputRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+    },
+    currencySymbol: {
+      ...typography.headingLarge,
+      color: colors.textSecondary,
+      fontWeight: '700',
+    },
+    amountInput: {
+      flex: 1,
+      ...typography.hero,
+      color: colors.textPrimary,
+      fontWeight: '800',
+    },
+    textInput: {
+      ...typography.bodyLarge,
+      color: colors.textPrimary,
+      paddingVertical: 4,
+    },
+    categoryPillsScroll: {
+      gap: spacing.xs,
+      paddingVertical: 4,
+    },
+    catPill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.surfaceSecondary,
+      paddingHorizontal: spacing.md,
+      paddingVertical: 8,
+      borderRadius: radii.full,
+      borderWidth: 1,
+      borderColor: colors.border,
+      gap: 6,
+    },
+    catDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+    },
+    catPillText: {
+      ...typography.caption,
+      color: colors.textPrimary,
+      fontWeight: '600',
+    },
+    catPillTextActive: {
+      color: '#FFFFFF',
+      fontWeight: '700',
+    },
+    saveButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.primary,
+      paddingVertical: spacing.md + 2,
+      borderRadius: radii.xl,
+      gap: spacing.xs,
+      marginTop: spacing.sm,
+      ...shadows.md,
+    },
+    saveButtonText: {
+      ...typography.bodyLarge,
+      color: '#FFFFFF',
+      fontWeight: '700',
+    },
+  });

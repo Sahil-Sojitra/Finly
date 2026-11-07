@@ -1,6 +1,7 @@
+import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { getGreeting, formatFullDate } from '@/domain/dateUtils';
-import { colors, spacing, typography } from '@/theme';
+import { spacing, typography, useTheme, ThemeColors } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 
 interface GreetingHeaderProps {
@@ -8,6 +9,9 @@ interface GreetingHeaderProps {
 }
 
 export function GreetingHeader({ currentDate }: GreetingHeaderProps) {
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
+
   const today = currentDate ?? new Date().toISOString().slice(0, 10);
   const greeting = getGreeting();
   const dateFormatted = formatFullDate(today);
@@ -25,33 +29,34 @@ export function GreetingHeader({ currentDate }: GreetingHeaderProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-  },
-  textContainer: {
-    flex: 1,
-  },
-  greeting: {
-    ...typography.headingMedium,
-    color: colors.textPrimary,
-  },
-  date: {
-    ...typography.bodyMedium,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  avatarContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.primaryLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#BFDBFE',
-  },
-});
+const getStyles = (colors: ThemeColors, isDark: boolean) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: spacing.md,
+    },
+    textContainer: {
+      flex: 1,
+    },
+    greeting: {
+      ...typography.headingMedium,
+      color: colors.textPrimary,
+    },
+    date: {
+      ...typography.bodyMedium,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    avatarContainer: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: colors.primaryLight,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: isDark ? colors.border : '#BFDBFE',
+    },
+  });

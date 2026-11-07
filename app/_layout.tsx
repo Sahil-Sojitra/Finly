@@ -6,53 +6,17 @@ import * as SplashScreen from 'expo-splash-screen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { initializeDatabase } from '@/database';
 import { WidgetService, BackupService } from '@/services';
-import { colors } from '@/theme';
+import { ThemeProvider, useTheme } from '@/theme';
 
 // Prevent splash screen from auto-hiding before initialization completes
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
-export default function RootLayout() {
-  const [dbReady, setDbReady] = useState(false);
-
-  useEffect(() => {
-    async function prepare() {
-      try {
-        await initializeDatabase();
-        setDbReady(true);
-        // Synchronize widget snapshot on startup (native mobile only)
-        if (Platform.OS !== 'web') {
-          WidgetService.syncFromDatabase().catch(() => {});
-          BackupService.checkAndRunScheduledBackup().catch(() => {});
-        }
-      } catch (e) {
-        console.warn('Database initialization warning:', e);
-        setDbReady(true);
-      } finally {
-        await SplashScreen.hideAsync().catch(() => {});
-      }
-    }
-
-    prepare();
-  }, []);
-
-  // Synchronize widget snapshot whenever app transitions to background
-  useEffect(() => {
-    const subscription = AppState.addEventListener('change', (nextState) => {
-      if (nextState === 'background' || nextState === 'inactive') {
-        WidgetService.syncFromDatabase().catch(() => {});
-      }
-    });
-    return () => subscription.remove();
-  }, []);
-
-
-  if (!dbReady) {
-    return null;
-  }
+function RootNavigation() {
+  const { colors, isDark } = useTheme();
 
   return (
-    <SafeAreaProvider>
-      <StatusBar style="dark" />
+    <>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
           headerStyle: {
@@ -95,6 +59,53 @@ export default function RootLayout() {
           }}
         />
       </Stack>
+    </>
+  );
+}
+
+export default function RootLayout() {
+  const [dbReady, setDbReady] = useState(false);
+
+  useEffect(() => {
+    async function prepare() {
+      try {
+        await initializeDatabase();
+        setDbReady(true);
+        // Synchronize widget snapshot on startup (native mobile only)
+        if (Platform.OS !== 'web') {
+          WidgetService.syncFromDatabase().catch(() => {});
+          BackupService.checkAndRunScheduledBackup().catch(() => {});
+        }
+      } catch (e) {
+        console.warn('Database initialization warning:', e);
+        setDbReady(true);
+      } finally {
+        await SplashScreen.hideAsync().catch(() => {});
+      }
+    }
+
+    prepare();
+  }, []);
+
+  // Synchronize widget snapshot whenever app transitions to background
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (nextState === 'background' || nextState === 'inactive') {
+        WidgetService.syncFromDatabase().catch(() => {});
+      }
+    });
+    return () => subscription.remove();
+  }, []);
+
+  if (!dbReady) {
+    return null;
+  }
+
+  return (
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <RootNavigation />
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

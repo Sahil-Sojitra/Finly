@@ -1,18 +1,22 @@
 import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function TabLayout() {
+  const { colors } = useTheme();
+
   return (
     <Tabs
       screenOptions={{
         headerStyle: {
           backgroundColor: colors.surface,
+          shadowColor: 'transparent',
+          elevation: 0,
         },
         headerTintColor: colors.textPrimary,
         headerTitleStyle: {
-          fontWeight: '600',
+          fontWeight: '700',
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSecondary,

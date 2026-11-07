@@ -1,13 +1,14 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { WidgetPreviewCard } from '@/features/widgets';
-import { colors, radii, shadows, spacing, typography } from '@/theme';
+import { radii, shadows, spacing, typography, useTheme } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useBackupStore } from '@/store';
 import { useEffect } from 'react';
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const { colors, isDark, themeMode, setThemeMode } = useTheme();
   const { isSignedIn, lastBackupTime, loadBackupState } = useBackupStore();
 
   useEffect(() => {
@@ -30,37 +31,133 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={styles.contentContainer}
+    >
       {/* App Info Card */}
-      <View style={styles.infoCard}>
+      <View style={[styles.infoCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
         <View style={styles.logoRow}>
           <Image source={require('../../assets/images/icon.png')} style={styles.logoBox} resizeMode="contain" />
           <View>
-            <Text style={styles.appTitle}>Finly</Text>
-            <Text style={styles.versionText}>Version 1.0.0 • Local-First Personal Finance</Text>
+            <Text style={[styles.appTitle, { color: colors.textPrimary }]}>Finly</Text>
+            <Text style={[styles.versionText, { color: colors.textSecondary }]}>Version 1.0.0 • Local-First Personal Finance</Text>
           </View>
         </View>
-        <Text style={styles.infoDescription}>
+        <Text style={[styles.infoDescription, { color: colors.textSecondary }]}>
           Finly manages expense tracking and cash flow based on your actual salary receipt dates rather than fixed calendar months.
         </Text>
       </View>
 
+      {/* Appearance & Night Vision Theme Selector */}
+      <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <View style={styles.cardHeader}>
+          <Ionicons name="color-palette-outline" size={20} color={colors.primary} />
+          <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>Appearance & Theme</Text>
+        </View>
+        <Text style={[styles.cardSubtitle, { color: colors.textSecondary }]}>
+          Reduce eye strain at night with dark mode, or automatically match your system appearance.
+        </Text>
+
+        <View style={styles.themeSelectorRow}>
+          <TouchableOpacity
+            style={[
+              styles.themeOptionBtn,
+              {
+                backgroundColor: themeMode === 'system' ? colors.primaryLight : colors.surfaceSubtle,
+                borderColor: themeMode === 'system' ? colors.primary : colors.border,
+              },
+            ]}
+            onPress={() => setThemeMode('system')}
+            activeOpacity={0.7}
+          >
+            <Ionicons
+              name="phone-portrait-outline"
+              size={18}
+              color={themeMode === 'system' ? colors.primary : colors.textSecondary}
+            />
+            <Text
+              style={[
+                styles.themeOptionText,
+                { color: themeMode === 'system' ? colors.primary : colors.textPrimary },
+              ]}
+            >
+              System
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.themeOptionBtn,
+              {
+                backgroundColor: themeMode === 'light' ? colors.primaryLight : colors.surfaceSubtle,
+                borderColor: themeMode === 'light' ? colors.primary : colors.border,
+              },
+            ]}
+            onPress={() => setThemeMode('light')}
+            activeOpacity={0.7}
+          >
+            <Ionicons
+              name="sunny-outline"
+              size={18}
+              color={themeMode === 'light' ? colors.primary : colors.textSecondary}
+            />
+            <Text
+              style={[
+                styles.themeOptionText,
+                { color: themeMode === 'light' ? colors.primary : colors.textPrimary },
+              ]}
+            >
+              Light
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.themeOptionBtn,
+              {
+                backgroundColor: themeMode === 'dark' ? (isDark ? '#1E3A8A' : colors.primaryLight) : colors.surfaceSubtle,
+                borderColor: themeMode === 'dark' ? colors.primary : colors.border,
+              },
+            ]}
+            onPress={() => setThemeMode('dark')}
+            activeOpacity={0.7}
+          >
+            <Ionicons
+              name="moon-outline"
+              size={18}
+              color={themeMode === 'dark' ? colors.primary : colors.textSecondary}
+            />
+            <Text
+              style={[
+                styles.themeOptionText,
+                { color: themeMode === 'dark' ? (isDark ? '#93C5FD' : colors.primary) : colors.textPrimary },
+              ]}
+            >
+              Dark
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
       {/* Cloud Backup & Recovery Entry Point */}
       <TouchableOpacity
-        style={styles.backupCard}
+        style={[styles.backupCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
         onPress={() => router.push('/backup' as never)}
         activeOpacity={0.8}
       >
-        <View style={styles.backupIconCircle}>
+        <View style={[styles.backupIconCircle, { backgroundColor: isDark ? colors.surfaceSecondary : '#EFF6FF' }]}>
           <Ionicons name="cloud-upload" size={22} color={colors.primary} />
         </View>
         <View style={styles.backupTextCol}>
           <View style={styles.backupTitleRow}>
-            <Text style={styles.backupTitle}>Cloud Backup & Recovery</Text>
+            <Text style={[styles.backupTitle, { color: colors.textPrimary }]}>Cloud Backup & Recovery</Text>
             <View
               style={[
                 styles.backupStatusBadge,
-                isSignedIn ? styles.badgeActive : styles.badgeOffline,
+                isSignedIn
+                  ? (isDark ? { backgroundColor: 'rgba(34, 197, 94, 0.2)' } : styles.badgeActive)
+                  : (isDark ? { backgroundColor: colors.surfaceSecondary } : styles.badgeOffline),
               ]}
             >
               <Text
@@ -73,7 +170,7 @@ export default function SettingsScreen() {
               </Text>
             </View>
           </View>
-          <Text style={styles.backupSubtitle}>
+          <Text style={[styles.backupSubtitle, { color: colors.textSecondary }]}>
             Google Drive appDataFolder • Last: {formatLastBackup(lastBackupTime)}
           </Text>
         </View>
@@ -84,21 +181,21 @@ export default function SettingsScreen() {
       <WidgetPreviewCard />
 
       {/* Privacy & Storage Section */}
-      <View style={styles.card}>
+      <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
         <View style={styles.cardHeader}>
           <Ionicons name="shield-checkmark-outline" size={20} color={colors.success} />
-          <Text style={styles.cardTitle}>Privacy & Data Protection</Text>
+          <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>Privacy & Data Protection</Text>
         </View>
-        <Text style={styles.cardBody}>
+        <Text style={[styles.cardBody, { color: colors.textSecondary }]}>
           • Local-First: All transaction records are stored on-device in SQLite.
         </Text>
-        <Text style={styles.cardBody}>
+        <Text style={[styles.cardBody, { color: colors.textSecondary }]}>
           • Zero-Knowledge Backup: AES-256-GCM encrypted with your recovery passphrase.
         </Text>
-        <Text style={styles.cardBody}>
+        <Text style={[styles.cardBody, { color: colors.textSecondary }]}>
           • Offline-Ready: Speech recognition and analytics run without external API subscriptions.
         </Text>
-        <Text style={styles.cardBody}>
+        <Text style={[styles.cardBody, { color: colors.textSecondary }]}>
           • Deterministic: Financial figures are stored strictly as integer paise with no floating-point currency drift.
         </Text>
       </View>
@@ -109,18 +206,15 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   contentContainer: {
     padding: spacing.md,
     paddingBottom: spacing.xxl,
   },
   infoCard: {
-    backgroundColor: colors.surface,
     padding: spacing.lg,
     borderRadius: radii.xl,
     borderWidth: 1,
-    borderColor: colors.border,
     marginBottom: spacing.md,
     ...shadows.sm,
   },
@@ -134,31 +228,45 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: radii.md,
-    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
   appTitle: {
     ...typography.headingMedium,
-    color: colors.textPrimary,
   },
   versionText: {
     ...typography.caption,
-    color: colors.textSecondary,
   },
   infoDescription: {
     ...typography.bodyMedium,
-    color: colors.textSecondary,
     lineHeight: 20,
+  },
+  themeSelectorRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginTop: spacing.md,
+  },
+  themeOptionBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radii.lg,
+    borderWidth: 1.5,
+    gap: 6,
+  },
+  themeOptionText: {
+    ...typography.bodyMedium,
+    fontWeight: '700',
   },
   backupCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surface,
     padding: spacing.lg,
     borderRadius: radii.xl,
     borderWidth: 1,
-    borderColor: colors.border,
     marginBottom: spacing.md,
     ...shadows.sm,
   },
@@ -166,7 +274,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#EFF6FF',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
@@ -182,11 +289,9 @@ const styles = StyleSheet.create({
   backupTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: colors.textPrimary,
   },
   backupSubtitle: {
     fontSize: 12,
-    color: colors.textSecondary,
     marginTop: 2,
   },
   backupStatusBadge: {
@@ -205,17 +310,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   badgeTextActive: {
-    color: colors.success,
+    color: '#16A34A',
   },
   badgeTextOffline: {
-    color: colors.textTertiary,
+    color: '#94A3B8',
   },
   card: {
-    backgroundColor: colors.surface,
     padding: spacing.lg,
     borderRadius: radii.xl,
     borderWidth: 1,
-    borderColor: colors.border,
     marginVertical: spacing.sm,
     ...shadows.sm,
   },
@@ -223,15 +326,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs,
   },
   cardTitle: {
     ...typography.headingSmall,
-    color: colors.textPrimary,
+  },
+  cardSubtitle: {
+    ...typography.bodySmall,
+    lineHeight: 18,
   },
   cardBody: {
     ...typography.bodyMedium,
-    color: colors.textSecondary,
     marginBottom: 4,
     lineHeight: 20,
   },

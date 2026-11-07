@@ -1,6 +1,7 @@
+import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, radii, shadows, spacing } from '@/theme';
+import { radii, shadows, spacing, useTheme, ThemeColors } from '@/theme';
 import { SpendingInsightsData } from '@/domain/insights/insightsTypes';
 
 interface DailyWeeklySummaryCardProps {
@@ -8,6 +9,9 @@ interface DailyWeeklySummaryCardProps {
 }
 
 export function DailyWeeklySummaryCard({ insights }: DailyWeeklySummaryCardProps) {
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
+
   const isWeekHigher = insights.weekOverWeekChangePercent > 0;
 
   return (
@@ -22,7 +26,7 @@ export function DailyWeeklySummaryCard({ insights }: DailyWeeklySummaryCardProps
       {/* Daily Row */}
       <View style={styles.trendRow}>
         <View style={styles.trendIconCol}>
-          <View style={[styles.miniCircle, { backgroundColor: '#EFF6FF' }]}>
+          <View style={[styles.miniCircle, { backgroundColor: isDark ? colors.surfaceSecondary : '#EFF6FF' }]}>
             <Ionicons name="today-outline" size={16} color={colors.primary} />
           </View>
         </View>
@@ -42,7 +46,7 @@ export function DailyWeeklySummaryCard({ insights }: DailyWeeklySummaryCardProps
       {/* Weekly Row */}
       <View style={styles.trendRow}>
         <View style={styles.trendIconCol}>
-          <View style={[styles.miniCircle, { backgroundColor: '#F0FDF4' }]}>
+          <View style={[styles.miniCircle, { backgroundColor: isDark ? 'rgba(34, 197, 94, 0.2)' : '#F0FDF4' }]}>
             <Ionicons name="trending-up" size={16} color={colors.success} />
           </View>
         </View>
@@ -82,101 +86,102 @@ export function DailyWeeklySummaryCard({ insights }: DailyWeeklySummaryCardProps
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.xl,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    ...shadows.sm,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  iconCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#EFF6FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.sm,
-  },
-  cardTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  trendRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingVertical: spacing.xs,
-  },
-  trendIconCol: {
-    marginRight: spacing.sm,
-  },
-  miniCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  trendDetailsCol: {
-    flex: 1,
-  },
-  weekTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 2,
-  },
-  trendLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  pctBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 8,
-    gap: 2,
-  },
-  pctBadgeDanger: {
-    backgroundColor: '#FEF2F2',
-  },
-  pctBadgeSuccess: {
-    backgroundColor: '#DCFCE7',
-  },
-  pctBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  pctBadgeTextDanger: {
-    color: colors.danger,
-  },
-  pctBadgeTextSuccess: {
-    color: colors.success,
-  },
-  trendValue: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginVertical: 2,
-  },
-  trendSubtext: {
-    fontSize: 11,
-    color: colors.textTertiary,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.borderLight,
-    marginVertical: spacing.md,
-  },
-});
+const getStyles = (colors: ThemeColors, isDark: boolean) =>
+  StyleSheet.create({
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radii.xl,
+      padding: spacing.lg,
+      marginBottom: spacing.md,
+      ...shadows.sm,
+      borderWidth: 1,
+      borderColor: colors.borderLight,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    iconCircle: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: isDark ? colors.surfaceSecondary : '#EFF6FF',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: spacing.sm,
+    },
+    cardTitle: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    trendRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      paddingVertical: spacing.xs,
+    },
+    trendIconCol: {
+      marginRight: spacing.sm,
+    },
+    miniCircle: {
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    trendDetailsCol: {
+      flex: 1,
+    },
+    weekTitleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: 2,
+    },
+    trendLabel: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.textSecondary,
+    },
+    pctBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      borderRadius: 8,
+      gap: 2,
+    },
+    pctBadgeDanger: {
+      backgroundColor: isDark ? 'rgba(239, 68, 68, 0.2)' : '#FEF2F2',
+    },
+    pctBadgeSuccess: {
+      backgroundColor: isDark ? 'rgba(34, 197, 94, 0.2)' : '#DCFCE7',
+    },
+    pctBadgeText: {
+      fontSize: 10,
+      fontWeight: '700',
+    },
+    pctBadgeTextDanger: {
+      color: colors.danger,
+    },
+    pctBadgeTextSuccess: {
+      color: colors.success,
+    },
+    trendValue: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginVertical: 2,
+    },
+    trendSubtext: {
+      fontSize: 11,
+      color: colors.textTertiary,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: colors.borderLight,
+      marginVertical: spacing.md,
+    },
+  });

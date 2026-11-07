@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
 import { AnalyticsFilter, AnalyticsFilterType } from '@/domain/analyticsEngine';
-import { colors, radii, spacing, typography } from '@/theme';
+import { radii, spacing, typography, useTheme, ThemeColors } from '@/theme';
 
 interface PeriodFilterSelectorProps {
   filter: AnalyticsFilter;
@@ -14,6 +14,9 @@ export function PeriodFilterSelector({
   onFilterChange,
   hasActiveCycle,
 }: PeriodFilterSelectorProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => getStyles(colors), [colors]);
+
   const [showCustomModal, setShowCustomModal] = useState(false);
   const [customStart, setCustomStart] = useState(
     filter.customStartDate ?? new Date().toISOString().slice(0, 10)
@@ -109,73 +112,74 @@ export function PeriodFilterSelector({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginVertical: spacing.sm,
-  },
-  pillsRow: {
-    flexDirection: 'row',
-    backgroundColor: colors.surfaceSecondary,
-    borderRadius: radii.full,
-    padding: 4,
-  },
-  pill: {
-    flex: 1,
-    paddingVertical: spacing.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: radii.full,
-  },
-  activePill: {
-    backgroundColor: colors.primary,
-  },
-  pillText: {
-    ...typography.caption,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  activePillText: {
-    color: '#FFFFFF',
-  },
-  customDateContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    backgroundColor: colors.surface,
-    padding: spacing.md,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginTop: spacing.sm,
-    gap: spacing.sm,
-  },
-  dateInputWrapper: {
-    flex: 1,
-  },
-  inputLabel: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginBottom: 4,
-  },
-  dateInput: {
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radii.md,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 6,
-    ...typography.bodyMedium,
-    color: colors.textPrimary,
-  },
-  applyButton: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: spacing.md,
-    paddingVertical: 8,
-    borderRadius: radii.md,
-    justifyContent: 'center',
-  },
-  applyButtonText: {
-    ...typography.caption,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-});
+const getStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      marginVertical: spacing.sm,
+    },
+    pillsRow: {
+      flexDirection: 'row',
+      backgroundColor: colors.surfaceSecondary,
+      borderRadius: radii.full,
+      padding: 4,
+    },
+    pill: {
+      flex: 1,
+      paddingVertical: spacing.sm,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: radii.full,
+    },
+    activePill: {
+      backgroundColor: colors.primary,
+    },
+    pillText: {
+      ...typography.caption,
+      fontWeight: '600',
+      color: colors.textSecondary,
+    },
+    activePillText: {
+      color: '#FFFFFF',
+    },
+    customDateContainer: {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      backgroundColor: colors.surface,
+      padding: spacing.md,
+      borderRadius: radii.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginTop: spacing.sm,
+      gap: spacing.sm,
+    },
+    dateInputWrapper: {
+      flex: 1,
+    },
+    inputLabel: {
+      ...typography.caption,
+      color: colors.textSecondary,
+      marginBottom: 4,
+    },
+    dateInput: {
+      backgroundColor: colors.background,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radii.md,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 6,
+      ...typography.bodyMedium,
+      color: colors.textPrimary,
+    },
+    applyButton: {
+      backgroundColor: colors.primary,
+      paddingHorizontal: spacing.md,
+      paddingVertical: 8,
+      borderRadius: radii.md,
+      justifyContent: 'center',
+    },
+    applyButtonText: {
+      ...typography.caption,
+      fontWeight: '700',
+      color: '#FFFFFF',
+    },
+  });

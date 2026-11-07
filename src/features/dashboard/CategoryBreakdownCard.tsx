@@ -1,7 +1,8 @@
+import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { CategorySpendBreakdown } from '@/domain/analyticsEngine';
 import { formatPaiseToInr } from '@/utils';
-import { colors, radii, shadows, spacing, typography } from '@/theme';
+import { radii, shadows, spacing, typography, useTheme, ThemeColors } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 
 interface CategoryBreakdownCardProps {
@@ -15,6 +16,9 @@ export function CategoryBreakdownCard({
   highestCategory,
   totalExpensesPaise,
 }: CategoryBreakdownCardProps) {
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
+
   if (categories.length === 0) {
     return (
       <View style={styles.container}>
@@ -39,7 +43,7 @@ export function CategoryBreakdownCard({
       {/* Highest Expense Category Callout */}
       {highestCategory && (
         <View style={styles.highestCallout}>
-          <Ionicons name="sparkles" size={16} color="#B45309" />
+          <Ionicons name="sparkles" size={16} color={isDark ? colors.warning : '#B45309'} />
           <Text style={styles.highestCalloutText}>
             Top Spend: <Text style={styles.boldText}>{highestCategory.categoryName}</Text> ({highestCategory.percentageOfTotal}% of expenses)
           </Text>
@@ -82,114 +86,115 @@ export function CategoryBreakdownCard({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.xl,
-    padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadows.sm,
-    marginVertical: spacing.sm,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  title: {
-    ...typography.headingSmall,
-    color: colors.textPrimary,
-  },
-  totalText: {
-    ...typography.headingSmall,
-    color: colors.textPrimary,
-    fontWeight: '700',
-  },
-  highestCallout: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FEF3C7',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs + 2,
-    borderRadius: radii.md,
-    gap: spacing.xs,
-    marginBottom: spacing.md,
-  },
-  highestCalloutText: {
-    ...typography.caption,
-    color: '#92400E',
-    fontWeight: '500',
-  },
-  boldText: {
-    fontWeight: '700',
-  },
-  listContainer: {
-    gap: spacing.md,
-  },
-  categoryItem: {
-    gap: 6,
-  },
-  categoryTopRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  categoryLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  categoryColorDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  categoryName: {
-    ...typography.bodyMedium,
-    color: colors.textPrimary,
-    fontWeight: '600',
-  },
-  txCountText: {
-    ...typography.caption,
-    color: colors.textTertiary,
-  },
-  categoryRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  amountText: {
-    ...typography.bodyMedium,
-    color: colors.textPrimary,
-    fontWeight: '700',
-  },
-  percentText: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    width: 32,
-    textAlign: 'right',
-    fontWeight: '600',
-  },
-  progressTrack: {
-    height: 6,
-    backgroundColor: colors.surfaceSecondary,
-    borderRadius: radii.full,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: radii.full,
-  },
-  emptyContainer: {
-    height: 100,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  emptyText: {
-    ...typography.bodyMedium,
-    color: colors.textTertiary,
-  },
-});
+const getStyles = (colors: ThemeColors, isDark: boolean) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: colors.surface,
+      borderRadius: radii.xl,
+      padding: spacing.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...shadows.sm,
+      marginVertical: spacing.sm,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.sm,
+    },
+    title: {
+      ...typography.headingSmall,
+      color: colors.textPrimary,
+    },
+    totalText: {
+      ...typography.headingSmall,
+      color: colors.textPrimary,
+      fontWeight: '700',
+    },
+    highestCallout: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: isDark ? 'rgba(251, 191, 36, 0.2)' : '#FEF3C7',
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs + 2,
+      borderRadius: radii.md,
+      gap: spacing.xs,
+      marginBottom: spacing.md,
+    },
+    highestCalloutText: {
+      ...typography.caption,
+      color: isDark ? colors.warning : '#92400E',
+      fontWeight: '500',
+    },
+    boldText: {
+      fontWeight: '700',
+    },
+    listContainer: {
+      gap: spacing.md,
+    },
+    categoryItem: {
+      gap: 6,
+    },
+    categoryTopRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    categoryLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+    },
+    categoryColorDot: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+    },
+    categoryName: {
+      ...typography.bodyMedium,
+      color: colors.textPrimary,
+      fontWeight: '600',
+    },
+    txCountText: {
+      ...typography.caption,
+      color: colors.textTertiary,
+    },
+    categoryRight: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    amountText: {
+      ...typography.bodyMedium,
+      color: colors.textPrimary,
+      fontWeight: '700',
+    },
+    percentText: {
+      ...typography.caption,
+      color: colors.textSecondary,
+      width: 32,
+      textAlign: 'right',
+      fontWeight: '600',
+    },
+    progressTrack: {
+      height: 6,
+      backgroundColor: colors.surfaceSecondary,
+      borderRadius: radii.full,
+      overflow: 'hidden',
+    },
+    progressFill: {
+      height: '100%',
+      borderRadius: radii.full,
+    },
+    emptyContainer: {
+      height: 100,
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: spacing.xs,
+    },
+    emptyText: {
+      ...typography.bodyMedium,
+      color: colors.textTertiary,
+    },
+  });

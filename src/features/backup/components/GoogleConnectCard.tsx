@@ -1,6 +1,7 @@
+import { useMemo } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, radii, shadows, spacing } from '@/theme';
+import { radii, shadows, spacing, useTheme, ThemeColors } from '@/theme';
 import { GoogleUserProfile } from '@/services';
 
 interface GoogleConnectCardProps {
@@ -18,6 +19,9 @@ export function GoogleConnectCard({
   onDisconnect,
   isLoading,
 }: GoogleConnectCardProps) {
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
+
   return (
     <View style={styles.card}>
       <View style={styles.headerRow}>
@@ -103,148 +107,149 @@ export function GoogleConnectCard({
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.lg,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    ...shadows.sm,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  iconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#EEF2FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.md,
-  },
-  headerTextCol: {
-    flex: 1,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  cardSubtitle: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  statusPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statusPillConnected: {
-    backgroundColor: '#DCFCE7',
-  },
-  statusPillDisconnected: {
-    backgroundColor: '#F1F5F9',
-  },
-  statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginRight: 4,
-  },
-  statusDotConnected: {
-    backgroundColor: colors.success,
-  },
-  statusDotDisconnected: {
-    backgroundColor: colors.textTertiary,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  statusTextConnected: {
-    color: colors.success,
-  },
-  statusTextDisconnected: {
-    color: colors.textSecondary,
-  },
-  profileSection: {
-    borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
-    paddingTop: spacing.md,
-  },
-  accountRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 6,
-  },
-  accountEmail: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: colors.textPrimary,
-  },
-  securityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: spacing.md,
-  },
-  securityText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  disconnectButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 10,
-    borderRadius: radii.md,
-    backgroundColor: '#FEF2F2',
-    borderWidth: 1,
-    borderColor: '#FCA5A5',
-    gap: 6,
-  },
-  disconnectButtonText: {
-    color: colors.danger,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  connectSection: {
-    borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
-    paddingTop: spacing.md,
-  },
-  explanationText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    lineHeight: 18,
-    marginBottom: spacing.md,
-  },
-  boldText: {
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  connectButton: {
-    backgroundColor: colors.primary,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    borderRadius: radii.md,
-    gap: 8,
-    ...shadows.sm,
-  },
-  connectButtonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '700',
-  },
-});
+const getStyles = (colors: ThemeColors, isDark: boolean) =>
+  StyleSheet.create({
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radii.xl,
+      padding: spacing.lg,
+      marginBottom: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.borderLight,
+      ...shadows.sm,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.xs,
+    },
+    iconCircle: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: isDark ? colors.surfaceSecondary : '#EFF6FF',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: spacing.md,
+    },
+    headerTextCol: {
+      flex: 1,
+    },
+    cardTitle: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    cardSubtitle: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    statusPill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 12,
+    },
+    statusPillConnected: {
+      backgroundColor: isDark ? 'rgba(34, 197, 94, 0.2)' : '#DCFCE7',
+    },
+    statusPillDisconnected: {
+      backgroundColor: colors.surfaceSecondary,
+    },
+    statusDot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      marginRight: 4,
+    },
+    statusDotConnected: {
+      backgroundColor: colors.success,
+    },
+    statusDotDisconnected: {
+      backgroundColor: colors.textTertiary,
+    },
+    statusText: {
+      fontSize: 12,
+      fontWeight: '500',
+    },
+    statusTextConnected: {
+      color: colors.success,
+    },
+    statusTextDisconnected: {
+      color: colors.textSecondary,
+    },
+    profileSection: {
+      borderTopWidth: 1,
+      borderTopColor: colors.borderLight,
+      paddingTop: spacing.md,
+    },
+    accountRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      marginBottom: 6,
+    },
+    accountEmail: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: colors.textPrimary,
+    },
+    securityRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      marginBottom: spacing.md,
+    },
+    securityText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
+    disconnectButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 10,
+      borderRadius: radii.md,
+      backgroundColor: isDark ? 'rgba(239, 68, 68, 0.15)' : '#FEF2F2',
+      borderWidth: 1,
+      borderColor: isDark ? colors.danger : '#FCA5A5',
+      gap: 6,
+    },
+    disconnectButtonText: {
+      color: colors.danger,
+      fontSize: 14,
+      fontWeight: '600',
+    },
+    connectSection: {
+      borderTopWidth: 1,
+      borderTopColor: colors.borderLight,
+      paddingTop: spacing.md,
+    },
+    explanationText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      lineHeight: 18,
+      marginBottom: spacing.md,
+    },
+    boldText: {
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    connectButton: {
+      backgroundColor: colors.primary,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 12,
+      borderRadius: radii.md,
+      gap: 8,
+      ...shadows.sm,
+    },
+    connectButtonText: {
+      color: '#FFFFFF',
+      fontSize: 14,
+      fontWeight: '700',
+    },
+  });

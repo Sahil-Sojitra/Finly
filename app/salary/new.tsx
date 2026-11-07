@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -13,10 +13,13 @@ import { useRouter } from 'expo-router';
 import { useSalaryCycleStore } from '@/store';
 import { parseInrToPaise } from '@/utils';
 import { Button } from '@/components/Button';
-import { colors, radii, spacing, typography } from '@/theme';
+import { radii, spacing, typography, useTheme, ThemeColors } from '@/theme';
 
 export default function NewSalaryCycleScreen() {
   const router = useRouter();
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
+
   const { recordSalary, cycles, isLoading } = useSalaryCycleStore();
 
   const isFirstCycle = cycles.length === 0;
@@ -99,103 +102,117 @@ export default function NewSalaryCycleScreen() {
             <View
               style={[
                 styles.inputContainer,
-                errors.salaryAmount ? styles.inputError : null,
+                Boolean(errors.salaryAmount) && styles.inputError,
               ]}
             >
               <Text style={styles.currencyPrefix}>₹</Text>
               <TextInput
                 style={styles.input}
                 value={salaryAmount}
-                onChangeText={setSalaryAmount}
-                placeholder="30,000"
-                placeholderTextColor={colors.textMuted}
-                keyboardType="numeric"
+                onChangeText={(val) => {
+                  setSalaryAmount(val);
+                  if (errors.salaryAmount) {
+                    setErrors((prev) => ({ ...prev, salaryAmount: '' }));
+                  }
+                }}
+                placeholder="e.g. 75,000"
+                placeholderTextColor={colors.textTertiary}
+                keyboardType="decimal-pad"
               />
             </View>
-            {errors.salaryAmount ? (
+            {Boolean(errors.salaryAmount) && (
               <Text style={styles.errorText}>{errors.salaryAmount}</Text>
-            ) : null}
+            )}
           </View>
 
-          {/* Actual Received Date */}
+          {/* Received Date */}
           <View style={styles.fieldGroup}>
-            <Text style={styles.label}>Actual Date Received *</Text>
+            <Text style={styles.label}>Salary Received Date *</Text>
             <View
               style={[
                 styles.inputContainer,
-                errors.receivedDate ? styles.inputError : null,
+                Boolean(errors.receivedDate) && styles.inputError,
               ]}
             >
               <TextInput
                 style={styles.input}
                 value={receivedDate}
-                onChangeText={setReceivedDate}
+                onChangeText={(val) => {
+                  setReceivedDate(val);
+                  if (errors.receivedDate) {
+                    setErrors((prev) => ({ ...prev, receivedDate: '' }));
+                  }
+                }}
                 placeholder="YYYY-MM-DD"
-                placeholderTextColor={colors.textMuted}
+                placeholderTextColor={colors.textTertiary}
               />
             </View>
             <Text style={styles.hintText}>
-              This cycle begins on this date. Next actual salary closes it.
+              The exact date this salary hit your account.
             </Text>
-            {errors.receivedDate ? (
+            {Boolean(errors.receivedDate) && (
               <Text style={styles.errorText}>{errors.receivedDate}</Text>
-            ) : null}
+            )}
           </View>
 
-          {/* Optional Opening Balance (Only for first cycle) */}
+          {/* Expected Next Salary Date */}
+          <View style={styles.fieldGroup}>
+            <Text style={styles.label}>Expected Next Payday (Optional)</Text>
+            <View
+              style={[
+                styles.inputContainer,
+                Boolean(errors.expectedNextDate) && styles.inputError,
+              ]}
+            >
+              <TextInput
+                style={styles.input}
+                value={expectedNextDate}
+                onChangeText={(val) => {
+                  setExpectedNextDate(val);
+                  if (errors.expectedNextDate) {
+                    setErrors((prev) => ({ ...prev, expectedNextDate: '' }));
+                  }
+                }}
+                placeholder="YYYY-MM-DD"
+                placeholderTextColor={colors.textTertiary}
+              />
+            </View>
+            <Text style={styles.hintText}>
+              Estimated end date for burn-rate and daily budget projections.
+            </Text>
+            {Boolean(errors.expectedNextDate) && (
+              <Text style={styles.errorText}>{errors.expectedNextDate}</Text>
+            )}
+          </View>
+
+          {/* Initial Opening Balance (Only shown for first cycle ever) */}
           {isFirstCycle && (
             <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Existing Bank / Cash Balance (₹)</Text>
+              <Text style={styles.label}>Initial Bank Balance (₹)</Text>
               <View style={styles.inputContainer}>
                 <Text style={styles.currencyPrefix}>₹</Text>
                 <TextInput
                   style={styles.input}
                   value={openingBalance}
                   onChangeText={setOpeningBalance}
-                  placeholder="0"
-                  placeholderTextColor={colors.textMuted}
-                  keyboardType="numeric"
+                  placeholder="0.00"
+                  placeholderTextColor={colors.textTertiary}
+                  keyboardType="decimal-pad"
                 />
               </View>
-              <Text style={styles.hintText}>
-                Initial funds available before this first salary. Future cycles automatically carry forward unspent balances.
+              <Text style={styles.infoAlert}>
+                Existing money in your account prior to this salary. Subsequent cycles
+                automatically carry forward remaining balances deterministically.
               </Text>
             </View>
           )}
 
-          {/* Optional Expected Next Date */}
-          <View style={styles.fieldGroup}>
-            <Text style={styles.label}>Expected Next Salary Date (Optional)</Text>
-            <View
-              style={[
-                styles.inputContainer,
-                errors.expectedNextDate ? styles.inputError : null,
-              ]}
-            >
-              <TextInput
-                style={styles.input}
-                value={expectedNextDate}
-                onChangeText={setExpectedNextDate}
-                placeholder="YYYY-MM-DD"
-                placeholderTextColor={colors.textMuted}
-              />
-            </View>
-            <Text style={styles.infoAlert}>
-              Informational reminder only. Expected dates never automatically close or transition a cycle.
-            </Text>
-            {errors.expectedNextDate ? (
-              <Text style={styles.errorText}>{errors.expectedNextDate}</Text>
-            ) : null}
-          </View>
-
-          {/* Action Button */}
           <Button
-            title={isLoading ? 'Saving...' : 'Save Salary Cycle'}
+            title="Confirm & Record Cycle"
             onPress={handleSubmit}
+            loading={isLoading}
             variant="primary"
             size="lg"
-            loading={isLoading}
-            fullWidth
             style={styles.submitBtn}
           />
         </View>
@@ -204,87 +221,88 @@ export default function NewSalaryCycleScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  keyboardView: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollContent: {
-    padding: spacing.lg,
-    alignItems: 'center',
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.xl,
-    maxWidth: 500,
-    width: '100%',
-  },
-  formTitle: {
-    ...typography.headingMedium,
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-  },
-  formSubtitle: {
-    ...typography.bodyMedium,
-    color: colors.textSecondary,
-    marginBottom: spacing.xl,
-    lineHeight: 20,
-  },
-  fieldGroup: {
-    marginBottom: spacing.lg,
-  },
-  label: {
-    ...typography.bodyMedium,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: radii.md,
-    backgroundColor: colors.surfaceSubtle,
-    paddingHorizontal: spacing.md,
-    minHeight: 48,
-  },
-  inputError: {
-    borderColor: colors.danger,
-  },
-  currencyPrefix: {
-    ...typography.headingSmall,
-    color: colors.textSecondary,
-    marginRight: spacing.xs,
-  },
-  input: {
-    flex: 1,
-    ...typography.bodyLarge,
-    color: colors.textPrimary,
-    paddingVertical: spacing.sm,
-  },
-  hintText: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-    marginTop: 4,
-  },
-  infoAlert: {
-    ...typography.bodySmall,
-    color: colors.primaryDark,
-    marginTop: 4,
-    backgroundColor: colors.primaryLight,
-    padding: spacing.xs,
-    borderRadius: radii.sm,
-  },
-  errorText: {
-    ...typography.bodySmall,
-    color: colors.danger,
-    marginTop: 4,
-  },
-  submitBtn: {
-    marginTop: spacing.md,
-  },
-});
+const getStyles = (colors: ThemeColors, isDark: boolean) =>
+  StyleSheet.create({
+    keyboardView: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollContent: {
+      padding: spacing.lg,
+      alignItems: 'center',
+    },
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radii.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.xl,
+      maxWidth: 500,
+      width: '100%',
+    },
+    formTitle: {
+      ...typography.headingMedium,
+      color: colors.textPrimary,
+      marginBottom: spacing.xs,
+    },
+    formSubtitle: {
+      ...typography.bodyMedium,
+      color: colors.textSecondary,
+      marginBottom: spacing.xl,
+      lineHeight: 20,
+    },
+    fieldGroup: {
+      marginBottom: spacing.lg,
+    },
+    label: {
+      ...typography.bodyMedium,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      marginBottom: spacing.xs,
+    },
+    inputContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      borderRadius: radii.md,
+      backgroundColor: colors.surfaceSubtle,
+      paddingHorizontal: spacing.md,
+      minHeight: 48,
+    },
+    inputError: {
+      borderColor: colors.danger,
+    },
+    currencyPrefix: {
+      ...typography.headingSmall,
+      color: colors.textSecondary,
+      marginRight: spacing.xs,
+    },
+    input: {
+      flex: 1,
+      ...typography.bodyLarge,
+      color: colors.textPrimary,
+      paddingVertical: spacing.sm,
+    },
+    hintText: {
+      ...typography.bodySmall,
+      color: colors.textSecondary,
+      marginTop: 4,
+    },
+    infoAlert: {
+      ...typography.bodySmall,
+      color: isDark ? '#93C5FD' : colors.primaryDark,
+      marginTop: 4,
+      backgroundColor: colors.primaryLight,
+      padding: spacing.xs,
+      borderRadius: radii.sm,
+    },
+    errorText: {
+      ...typography.bodySmall,
+      color: colors.danger,
+      marginTop: 4,
+    },
+    submitBtn: {
+      marginTop: spacing.md,
+    },
+  });

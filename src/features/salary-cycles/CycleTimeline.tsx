@@ -1,20 +1,28 @@
+import { useMemo } from 'react';
 import { StyleSheet, Text, View, Pressable } from 'react-native';
 import { CycleMetrics } from '@/domain/salaryCycleEngine';
 import { formatDisplayDate } from '@/domain/dateUtils';
 import { formatPaiseToInr } from '@/utils';
-import { colors, radii, spacing, typography, shadows } from '@/theme';
+import { radii, spacing, typography, shadows, useTheme, ThemeColors } from '@/theme';
 
 export interface CycleTimelineProps {
-  metrics: CycleMetrics[];
+  evaluation?: { cycles: any[]; metricsByCycleId: Map<string, CycleMetrics> };
+  metrics?: CycleMetrics[];
   onEditCycle?: (cycleId: string) => void;
   onDeleteCycle?: (cycleId: string) => void;
 }
 
 export function CycleTimeline({
-  metrics,
+  evaluation,
+  metrics: explicitMetrics,
   onEditCycle,
   onDeleteCycle,
 }: CycleTimelineProps) {
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
+
+  const metrics = explicitMetrics ?? (evaluation ? Array.from(evaluation.metricsByCycleId.values()) : []);
+
   if (metrics.length === 0) {
     return null;
   }
@@ -151,159 +159,160 @@ export function CycleTimeline({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginVertical: spacing.lg,
-  },
-  sectionTitle: {
-    ...typography.headingSmall,
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
-  },
-  timelineList: {
-    paddingLeft: spacing.xs,
-  },
-  timelineRow: {
-    flexDirection: 'row',
-    marginBottom: spacing.md,
-  },
-  nodeColumn: {
-    width: 28,
-    alignItems: 'center',
-  },
-  nodeDot: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    marginTop: 6,
-    zIndex: 2,
-  },
-  nodeActive: {
-    backgroundColor: colors.primary,
-    borderWidth: 2,
-    borderColor: colors.surface,
-  },
-  nodeClosed: {
-    backgroundColor: colors.borderStrong,
-  },
-  connectorLine: {
-    width: 2,
-    flex: 1,
-    backgroundColor: colors.border,
-    marginVertical: 4,
-  },
-  card: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: radii.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
-    marginLeft: spacing.sm,
-    ...shadows.card,
-  },
-  cardActive: {
-    borderColor: colors.primary,
-    borderWidth: 1.5,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: spacing.md,
-  },
-  titleColumn: {
-    flex: 1,
-  },
-  badgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginBottom: 4,
-  },
-  statusBadge: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: radii.sm,
-  },
-  badgeActive: {
-    backgroundColor: colors.primaryLight,
-  },
-  badgeClosed: {
-    backgroundColor: colors.surfaceMuted,
-  },
-  statusText: {
-    ...typography.bodySmall,
-    fontWeight: '600',
-  },
-  statusTextActive: {
-    color: colors.primary,
-  },
-  statusTextClosed: {
-    color: colors.textSecondary,
-  },
-  durationText: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-  },
-  dateRange: {
-    ...typography.bodyMedium,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
-  actionRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  actionBtn: {
-    paddingHorizontal: spacing.xs,
-    paddingVertical: 2,
-  },
-  actionText: {
-    ...typography.bodySmall,
-    color: colors.primary,
-    fontWeight: '500',
-  },
-  actionDeleteText: {
-    ...typography.bodySmall,
-    color: colors.danger,
-    fontWeight: '500',
-  },
-  metricsGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: colors.surfaceSubtle,
-    borderRadius: radii.sm,
-    padding: spacing.sm,
-  },
-  metricItem: {
-    alignItems: 'center',
-  },
-  metricLabel: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-    marginBottom: 2,
-  },
-  metricValue: {
-    ...typography.bodyMedium,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
-  metricValuePrimary: {
-    ...typography.bodyMedium,
-    fontWeight: '700',
-    color: colors.primary,
-  },
-  metricValueExpense: {
-    ...typography.bodyMedium,
-    fontWeight: '600',
-    color: colors.danger,
-  },
-  metricPositive: {
-    color: colors.success,
-  },
-  metricNegative: {
-    color: colors.danger,
-  },
-});
+const getStyles = (colors: ThemeColors, isDark: boolean) =>
+  StyleSheet.create({
+    container: {
+      marginVertical: spacing.lg,
+    },
+    sectionTitle: {
+      ...typography.headingSmall,
+      color: colors.textPrimary,
+      marginBottom: spacing.md,
+    },
+    timelineList: {
+      paddingLeft: spacing.xs,
+    },
+    timelineRow: {
+      flexDirection: 'row',
+      marginBottom: spacing.md,
+    },
+    nodeColumn: {
+      width: 28,
+      alignItems: 'center',
+    },
+    nodeDot: {
+      width: 14,
+      height: 14,
+      borderRadius: 7,
+      marginTop: 6,
+      zIndex: 2,
+    },
+    nodeActive: {
+      backgroundColor: colors.primary,
+      borderWidth: 2,
+      borderColor: colors.surface,
+    },
+    nodeClosed: {
+      backgroundColor: colors.borderStrong,
+    },
+    connectorLine: {
+      width: 2,
+      flex: 1,
+      backgroundColor: colors.border,
+      marginVertical: 4,
+    },
+    card: {
+      flex: 1,
+      backgroundColor: colors.surface,
+      borderRadius: radii.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.md,
+      marginLeft: spacing.sm,
+      ...shadows.card,
+    },
+    cardActive: {
+      borderColor: colors.primary,
+      borderWidth: 1.5,
+    },
+    cardHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: spacing.md,
+    },
+    titleColumn: {
+      flex: 1,
+    },
+    badgeRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      marginBottom: 4,
+    },
+    statusBadge: {
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 2,
+      borderRadius: radii.sm,
+    },
+    badgeActive: {
+      backgroundColor: colors.primaryLight,
+    },
+    badgeClosed: {
+      backgroundColor: colors.surfaceMuted,
+    },
+    statusText: {
+      ...typography.bodySmall,
+      fontWeight: '600',
+    },
+    statusTextActive: {
+      color: isDark ? '#93C5FD' : colors.primary,
+    },
+    statusTextClosed: {
+      color: colors.textSecondary,
+    },
+    durationText: {
+      ...typography.bodySmall,
+      color: colors.textSecondary,
+    },
+    dateRange: {
+      ...typography.bodyMedium,
+      fontWeight: '600',
+      color: colors.textPrimary,
+    },
+    actionRow: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+    },
+    actionBtn: {
+      paddingHorizontal: spacing.xs,
+      paddingVertical: 2,
+    },
+    actionText: {
+      ...typography.bodySmall,
+      color: colors.primary,
+      fontWeight: '500',
+    },
+    actionDeleteText: {
+      ...typography.bodySmall,
+      color: colors.danger,
+      fontWeight: '500',
+    },
+    metricsGrid: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      backgroundColor: colors.surfaceSubtle,
+      borderRadius: radii.sm,
+      padding: spacing.sm,
+    },
+    metricItem: {
+      alignItems: 'center',
+    },
+    metricLabel: {
+      ...typography.bodySmall,
+      color: colors.textSecondary,
+      marginBottom: 2,
+    },
+    metricValue: {
+      ...typography.bodyMedium,
+      fontWeight: '600',
+      color: colors.textPrimary,
+    },
+    metricValuePrimary: {
+      ...typography.bodyMedium,
+      fontWeight: '700',
+      color: colors.primary,
+    },
+    metricValueExpense: {
+      ...typography.bodyMedium,
+      fontWeight: '600',
+      color: colors.danger,
+    },
+    metricPositive: {
+      color: colors.success,
+    },
+    metricNegative: {
+      color: colors.danger,
+    },
+  });
 

@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import { DailySpendingPoint, WeeklySpendingPoint } from '@/domain/analyticsEngine';
 import { formatPaiseToInr } from '@/utils';
-import { colors, radii, shadows, spacing, typography } from '@/theme';
+import { radii, shadows, spacing, typography, useTheme, ThemeColors } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 
 interface SpendingTrendChartProps {
@@ -16,6 +16,9 @@ export function SpendingTrendChart({
   weeklySpending,
   averageDailyExpensePaise,
 }: SpendingTrendChartProps) {
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
+
   const [viewMode, setViewMode] = useState<'daily' | 'weekly'>('daily');
   const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(null);
 
@@ -99,14 +102,17 @@ export function SpendingTrendChart({
         >
           {dataPoints.map((point, idx) => {
             const isSelected = selectedPointIndex === idx;
-            const barHeightPct = Math.max(6, Math.round((point.amountPaise / maxAmount) * 100));
+            const heightPercentage = Math.max(
+              point.amountPaise > 0 ? 8 : 0,
+              Math.min(100, Math.round((point.amountPaise / maxAmount) * 100))
+            );
             const isToday = 'isToday' in point ? point.isToday : false;
 
             return (
               <TouchableOpacity
-                key={idx}
+                key={'date' in point ? point.date : point.weekIndex}
                 style={styles.barColumn}
-                onPress={() => setSelectedPointIndex(isSelected ? null : idx)}
+                onPress={() => setSelectedPointIndex(idx)}
                 activeOpacity={0.8}
               >
                 {/* Bar Track & Fill */}
@@ -114,15 +120,15 @@ export function SpendingTrendChart({
                   <View
                     style={[
                       styles.barFill,
-                      { height: `${barHeightPct}%` },
-                      point.amountPaise === 0 && styles.barZeroFill,
+                      { height: `${heightPercentage}%` },
                       isSelected && styles.barSelectedFill,
-                      isToday && styles.barTodayFill,
+                      isToday && !isSelected && styles.barTodayFill,
+                      point.amountPaise === 0 && styles.barZeroFill,
                     ]}
                   />
                 </View>
 
-                {/* X-Axis Label */}
+                {/* X-Axis Labels */}
                 <Text
                   style={[
                     styles.barLabel,
@@ -134,11 +140,8 @@ export function SpendingTrendChart({
                   {'dayOfWeek' in point ? point.dayOfWeek : point.label}
                 </Text>
 
-                {/* Sub-label for date if daily */}
                 {'displayDate' in point && (
-                  <Text style={styles.barSubLabel} numberOfLines={1}>
-                    {point.displayDate.split(' ')[0]}
-                  </Text>
+                  <Text style={styles.barSubLabel}>{point.displayDate.slice(0, 2)}</Text>
                 )}
               </TouchableOpacity>
             );
@@ -149,136 +152,139 @@ export function SpendingTrendChart({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.xl,
-    padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadows.sm,
-    marginVertical: spacing.sm,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  title: {
-    ...typography.headingSmall,
-    color: colors.textPrimary,
-  },
-  subtitle: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  toggleContainer: {
-    flexDirection: 'row',
-    backgroundColor: colors.surfaceSecondary,
-    borderRadius: radii.full,
-    padding: 3,
-  },
-  toggleButton: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
-    borderRadius: radii.full,
-  },
-  activeToggleButton: {
-    backgroundColor: colors.primary,
-  },
-  toggleText: {
-    ...typography.caption,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  activeToggleText: {
-    color: '#FFFFFF',
-  },
-  tooltipBox: {
-    backgroundColor: colors.surfaceSecondary,
-    borderRadius: radii.md,
-    padding: spacing.sm,
-    marginBottom: spacing.md,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  tooltipLabel: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
-  tooltipAmount: {
-    ...typography.bodyMedium,
-    color: colors.danger,
-    fontWeight: '700',
-  },
-  chartScrollContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    paddingTop: spacing.md,
-    paddingBottom: spacing.xs,
-    gap: 8,
-    minWidth: '100%',
-    justifyContent: 'space-between',
-  },
-  barColumn: {
-    alignItems: 'center',
-    width: 38,
-  },
-  barTrack: {
-    height: 120,
-    width: 14,
-    backgroundColor: colors.surfaceSecondary,
-    borderRadius: radii.full,
-    justifyContent: 'flex-end',
-    overflow: 'hidden',
-    marginBottom: 6,
-  },
-  barFill: {
-    width: '100%',
-    backgroundColor: colors.primary,
-    borderRadius: radii.full,
-  },
-  barZeroFill: {
-    backgroundColor: 'transparent',
-  },
-  barSelectedFill: {
-    backgroundColor: colors.primaryDark,
-  },
-  barTodayFill: {
-    backgroundColor: colors.accent,
-  },
-  barLabel: {
-    ...typography.caption,
-    fontSize: 10,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  barSubLabel: {
-    fontSize: 9,
-    color: colors.textTertiary,
-  },
-  barSelectedLabel: {
-    color: colors.primary,
-    fontWeight: '700',
-  },
-  barTodayLabel: {
-    color: colors.accent,
-    fontWeight: '700',
-  },
-  emptyContainer: {
-    height: 120,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  emptyText: {
-    ...typography.bodyMedium,
-    color: colors.textTertiary,
-  },
-});
+const getStyles = (colors: ThemeColors, isDark: boolean) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: colors.surface,
+      borderRadius: radii.xl,
+      padding: spacing.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginVertical: spacing.sm,
+      ...shadows.card,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    title: {
+      ...typography.headingSmall,
+      color: colors.textPrimary,
+    },
+    subtitle: {
+      ...typography.caption,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    toggleContainer: {
+      flexDirection: 'row',
+      backgroundColor: colors.surfaceSecondary,
+      borderRadius: radii.full,
+      padding: 3,
+    },
+    toggleButton: {
+      paddingHorizontal: spacing.md,
+      paddingVertical: 4,
+      borderRadius: radii.full,
+    },
+    activeToggleButton: {
+      backgroundColor: colors.surface,
+      ...shadows.sm,
+    },
+    toggleText: {
+      ...typography.caption,
+      color: colors.textSecondary,
+      fontWeight: '600',
+    },
+    activeToggleText: {
+      color: colors.textPrimary,
+      fontWeight: '700',
+    },
+    tooltipBox: {
+      backgroundColor: colors.surfaceSecondary,
+      borderRadius: radii.md,
+      padding: spacing.sm,
+      marginBottom: spacing.md,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    tooltipLabel: {
+      ...typography.caption,
+      color: colors.textSecondary,
+      fontWeight: '600',
+    },
+    tooltipAmount: {
+      ...typography.bodyMedium,
+      color: colors.danger,
+      fontWeight: '700',
+    },
+    chartScrollContainer: {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      paddingTop: spacing.md,
+      paddingBottom: spacing.xs,
+      gap: 8,
+      minWidth: '100%',
+      justifyContent: 'space-between',
+    },
+    barColumn: {
+      alignItems: 'center',
+      width: 38,
+    },
+    barTrack: {
+      height: 120,
+      width: 14,
+      backgroundColor: colors.surfaceSecondary,
+      borderRadius: radii.full,
+      justifyContent: 'flex-end',
+      overflow: 'hidden',
+      marginBottom: 6,
+    },
+    barFill: {
+      width: '100%',
+      backgroundColor: colors.primary,
+      borderRadius: radii.full,
+    },
+    barZeroFill: {
+      backgroundColor: 'transparent',
+    },
+    barSelectedFill: {
+      backgroundColor: isDark ? '#60A5FA' : colors.primaryDark,
+    },
+    barTodayFill: {
+      backgroundColor: colors.accent,
+    },
+    barLabel: {
+      ...typography.caption,
+      fontSize: 10,
+      fontWeight: '600',
+      color: colors.textSecondary,
+    },
+    barSubLabel: {
+      fontSize: 9,
+      color: colors.textTertiary,
+    },
+    barSelectedLabel: {
+      color: colors.primary,
+      fontWeight: '700',
+    },
+    barTodayLabel: {
+      color: colors.accent,
+      fontWeight: '700',
+    },
+    emptyContainer: {
+      height: 120,
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: spacing.xs,
+    },
+    emptyText: {
+      ...typography.bodyMedium,
+      color: colors.textTertiary,
+    },
+  });

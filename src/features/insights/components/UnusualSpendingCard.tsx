@@ -1,6 +1,7 @@
+import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, radii, shadows, spacing } from '@/theme';
+import { radii, shadows, spacing, useTheme, ThemeColors } from '@/theme';
 import { UnusualSpendingAnomaly } from '@/domain/insights/insightsTypes';
 
 interface UnusualSpendingCardProps {
@@ -8,6 +9,9 @@ interface UnusualSpendingCardProps {
 }
 
 export function UnusualSpendingCard({ anomalies }: UnusualSpendingCardProps) {
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
+
   if (anomalies.length === 0) return null;
 
   return (
@@ -54,81 +58,82 @@ export function UnusualSpendingCard({ anomalies }: UnusualSpendingCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.xl,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    ...shadows.sm,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  iconCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#FEF3C7',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.sm,
-  },
-  textCol: {
-    flex: 1,
-  },
-  cardTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  cardSubtitle: {
-    fontSize: 11,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  list: {
-    gap: spacing.sm,
-  },
-  itemRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: '#F8FAFC',
-    borderRadius: radii.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: '#F1F5F9',
-  },
-  itemIconCol: {
-    marginRight: spacing.sm,
-    marginTop: 2,
-  },
-  itemTextCol: {
-    flex: 1,
-  },
-  itemTitleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 2,
-  },
-  itemTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  itemAmount: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: colors.danger,
-  },
-  itemDesc: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    lineHeight: 16,
-  },
-});
+const getStyles = (colors: ThemeColors, isDark: boolean) =>
+  StyleSheet.create({
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radii.xl,
+      padding: spacing.lg,
+      marginBottom: spacing.md,
+      ...shadows.sm,
+      borderWidth: 1,
+      borderColor: colors.borderLight,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    iconCircle: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: isDark ? 'rgba(217, 119, 6, 0.2)' : '#FEF3C7',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: spacing.sm,
+    },
+    textCol: {
+      flex: 1,
+    },
+    cardTitle: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    cardSubtitle: {
+      fontSize: 11,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    list: {
+      gap: spacing.sm,
+    },
+    itemRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      backgroundColor: colors.surfaceSecondary,
+      borderRadius: radii.md,
+      padding: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    itemIconCol: {
+      marginRight: spacing.sm,
+      marginTop: 2,
+    },
+    itemTextCol: {
+      flex: 1,
+    },
+    itemTitleRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 2,
+    },
+    itemTitle: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    itemAmount: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: colors.danger,
+    },
+    itemDesc: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      lineHeight: 16,
+    },
+  });

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, radii, shadows, spacing } from '@/theme';
+import { radii, shadows, spacing, useTheme, ThemeColors } from '@/theme';
 import { DriveBackupItem } from '@/domain/backup/backupTypes';
 
 interface RestoreConfirmationModalProps {
@@ -33,6 +33,9 @@ export function RestoreConfirmationModal({
   onClose,
   onConfirmRestore,
 }: RestoreConfirmationModalProps) {
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
+
   const [passphrase, setPassphrase] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
@@ -98,12 +101,12 @@ export function RestoreConfirmationModal({
           <View style={styles.safetyBox}>
             <Ionicons name="shield-checkmark" size={18} color={colors.success} />
             <Text style={styles.safetyText}>
-              A local safety snapshot of your current records will be created automatically before
-              restoring. You can revert if needed.
+              Finly will automatically create a local safety backup of current data before
+              restoring. Existing records will never be silently lost.
             </Text>
           </View>
 
-          {/* Passphrase Input */}
+          {/* Decryption Passphrase Input */}
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Enter Decryption Passphrase</Text>
             <View style={styles.inputWrapper}>
@@ -112,6 +115,7 @@ export function RestoreConfirmationModal({
                 value={passphrase}
                 onChangeText={setPassphrase}
                 placeholder="Passphrase used when backing up"
+                placeholderTextColor={colors.textTertiary}
                 secureTextEntry={!showPassword}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -122,9 +126,9 @@ export function RestoreConfirmationModal({
                 style={styles.eyeButton}
               >
                 <Ionicons
-                  name={showPassword ? 'eye-off' : 'eye'}
-                  size={18}
-                  color={colors.textTertiary}
+                  name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                  size={20}
+                  color={colors.textSecondary}
                 />
               </TouchableOpacity>
             </View>
@@ -150,27 +154,30 @@ export function RestoreConfirmationModal({
             </View>
           )}
 
-          {/* Action Buttons */}
+          {/* Actions */}
           <View style={styles.buttonRow}>
-            {!isRestoring && (
-              <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={onClose}
+              disabled={isRestoring}
+            >
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+
             <TouchableOpacity
               style={[
                 styles.restoreButton,
-                (!passphrase || isRestoring) && styles.buttonDisabled,
+                (!passphrase.trim() || isRestoring) && styles.buttonDisabled,
               ]}
               onPress={handleRestore}
-              disabled={!passphrase || isRestoring}
+              disabled={!passphrase.trim() || isRestoring}
             >
               {isRestoring ? (
                 <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
                 <>
-                  <Ionicons name="refresh" size={16} color="#FFFFFF" />
-                  <Text style={styles.restoreButtonText}>Verify & Restore</Text>
+                  <Ionicons name="cloud-download-outline" size={18} color="#FFFFFF" />
+                  <Text style={styles.restoreButtonText}>Confirm & Restore</Text>
                 </>
               )}
             </TouchableOpacity>
@@ -181,178 +188,179 @@ export function RestoreConfirmationModal({
   );
 }
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.6)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.lg,
-  },
-  modalContent: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.xl,
-    padding: spacing.xl,
-    width: '100%',
-    maxWidth: 420,
-    ...shadows.lg,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  iconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#EFF6FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.sm,
-  },
-  title: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  closeButton: {
-    padding: 4,
-  },
-  summaryBox: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: radii.md,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-    gap: 6,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  summaryLabel: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  summaryValue: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
-  safetyBox: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: '#F0FDF4',
-    borderRadius: radii.md,
-    padding: spacing.md,
-    gap: 8,
-    marginBottom: spacing.lg,
-    borderWidth: 1,
-    borderColor: '#BBF7D0',
-  },
-  safetyText: {
-    flex: 1,
-    fontSize: 11,
-    color: '#166534',
-    lineHeight: 16,
-  },
-  inputContainer: {
-    marginBottom: spacing.lg,
-  },
-  inputLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: colors.textSecondary,
-    marginBottom: 6,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-    borderRadius: radii.md,
-    backgroundColor: '#F8FAFC',
-  },
-  textInput: {
-    flex: 1,
-    paddingHorizontal: spacing.md,
-    paddingVertical: 10,
-    fontSize: 14,
-    color: colors.textPrimary,
-  },
-  eyeButton: {
-    padding: 10,
-  },
-  progressContainer: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: radii.md,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-  },
-  progressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  progressStatusText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: colors.primary,
-  },
-  progressPercentText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: colors.primary,
-  },
-  progressBarTrack: {
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#E2E8F0',
-    overflow: 'hidden',
-  },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: colors.primary,
-    borderRadius: 3,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-  },
-  cancelButton: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: 'center',
-    borderRadius: radii.md,
-    backgroundColor: '#F1F5F9',
-  },
-  cancelButtonText: {
-    color: colors.textSecondary,
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  restoreButton: {
-    flex: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    borderRadius: radii.md,
-    backgroundColor: colors.primary,
-    gap: 6,
-  },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
-  restoreButtonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '700',
-  },
-});
+const getStyles = (colors: ThemeColors, isDark: boolean) =>
+  StyleSheet.create({
+    overlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.65)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing.md,
+    },
+    modalContent: {
+      backgroundColor: colors.surface,
+      borderRadius: radii.xl,
+      padding: spacing.xl,
+      width: '100%',
+      maxWidth: 420,
+      ...shadows.lg,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    iconCircle: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: isDark ? colors.surfaceSecondary : '#EFF6FF',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: spacing.sm,
+    },
+    title: {
+      flex: 1,
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    closeButton: {
+      padding: 4,
+    },
+    summaryBox: {
+      backgroundColor: colors.surfaceSecondary,
+      borderRadius: radii.md,
+      padding: spacing.md,
+      marginBottom: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.borderLight,
+      gap: 6,
+    },
+    summaryRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    summaryLabel: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
+    summaryValue: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.textPrimary,
+    },
+    safetyBox: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      backgroundColor: isDark ? 'rgba(34, 197, 94, 0.15)' : '#F0FDF4',
+      borderRadius: radii.md,
+      padding: spacing.md,
+      gap: 8,
+      marginBottom: spacing.lg,
+      borderWidth: 1,
+      borderColor: isDark ? colors.success : '#BBF7D0',
+    },
+    safetyText: {
+      flex: 1,
+      fontSize: 11,
+      color: isDark ? colors.success : '#166534',
+      lineHeight: 16,
+    },
+    inputContainer: {
+      marginBottom: spacing.lg,
+    },
+    inputLabel: {
+      fontSize: 12,
+      fontWeight: '500',
+      color: colors.textSecondary,
+      marginBottom: 6,
+    },
+    inputWrapper: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.borderLight,
+      borderRadius: radii.md,
+      backgroundColor: colors.surfaceSecondary,
+    },
+    textInput: {
+      flex: 1,
+      paddingHorizontal: spacing.md,
+      paddingVertical: 10,
+      fontSize: 14,
+      color: colors.textPrimary,
+    },
+    eyeButton: {
+      padding: 10,
+    },
+    progressContainer: {
+      backgroundColor: colors.surfaceSecondary,
+      borderRadius: radii.md,
+      padding: spacing.md,
+      marginBottom: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.borderLight,
+    },
+    progressHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    progressStatusText: {
+      fontSize: 12,
+      fontWeight: '500',
+      color: colors.primary,
+    },
+    progressPercentText: {
+      fontSize: 12,
+      fontWeight: '700',
+      color: colors.primary,
+    },
+    progressBarTrack: {
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: colors.border,
+      overflow: 'hidden',
+    },
+    progressBarFill: {
+      height: '100%',
+      backgroundColor: colors.primary,
+      borderRadius: 3,
+    },
+    buttonRow: {
+      flexDirection: 'row',
+      gap: spacing.md,
+    },
+    cancelButton: {
+      flex: 1,
+      paddingVertical: 12,
+      alignItems: 'center',
+      borderRadius: radii.md,
+      backgroundColor: colors.surfaceSecondary,
+    },
+    cancelButtonText: {
+      color: colors.textSecondary,
+      fontSize: 14,
+      fontWeight: '500',
+    },
+    restoreButton: {
+      flex: 2,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 12,
+      borderRadius: radii.md,
+      backgroundColor: colors.primary,
+      gap: 6,
+    },
+    buttonDisabled: {
+      opacity: 0.5,
+    },
+    restoreButtonText: {
+      color: '#FFFFFF',
+      fontSize: 14,
+      fontWeight: '700',
+    },
+  });

@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -13,10 +13,13 @@ import { CycleTimeline } from '@/features/salary-cycles/CycleTimeline';
 import { formatDisplayDate } from '@/domain/dateUtils';
 import { formatPaiseToInr } from '@/utils';
 import { Button } from '@/components/Button';
-import { colors, radii, spacing, typography, shadows } from '@/theme';
+import { radii, spacing, typography, shadows, useTheme, ThemeColors } from '@/theme';
 
 export default function SalaryScreen() {
   const router = useRouter();
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
+
   const { evaluation, isLoading, fetchCycles, deleteSalary } = useSalaryCycleStore();
   const { fetchTransactions } = useTransactionStore();
 
@@ -54,7 +57,12 @@ export default function SalaryScreen() {
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
       refreshControl={
-        <RefreshControl refreshing={isLoading} onRefresh={loadData} />
+        <RefreshControl
+          refreshing={isLoading}
+          onRefresh={loadData}
+          tintColor={colors.primary}
+          colors={[colors.primary]}
+        />
       }
     >
       {/* Top Banner Action */}
@@ -99,45 +107,43 @@ export default function SalaryScreen() {
 
           <View style={styles.heroStatsGrid}>
             <View style={styles.heroStat}>
-              <Text style={styles.statLabel}>Salary Received</Text>
+              <Text style={styles.statLabel}>Base Salary</Text>
               <Text style={styles.statValue}>
-                {formatPaiseToInr(activeMetrics.baseSalaryPaise, false)}
+                {formatPaiseToInr(activeMetrics.baseSalaryPaise)}
               </Text>
             </View>
 
             <View style={styles.heroStat}>
-              <Text style={styles.statLabel}>Carried Over</Text>
-              <Text style={styles.statValue}>
-                {formatPaiseToInr(activeMetrics.openingBalancePaise, false)}
-              </Text>
-            </View>
-
-            <View style={styles.heroStat}>
-              <Text style={styles.statLabel}>Spent so far</Text>
+              <Text style={styles.statLabel}>Total Spent</Text>
               <Text style={styles.statValueExpense}>
-                {formatPaiseToInr(activeMetrics.expensesPaise, false)}
+                {formatPaiseToInr(activeMetrics.expensesPaise)}
+              </Text>
+            </View>
+
+            <View style={styles.heroStat}>
+              <Text style={styles.statLabel}>Opening Balance</Text>
+              <Text style={styles.statValue}>
+                {formatPaiseToInr(activeMetrics.openingBalancePaise)}
               </Text>
             </View>
           </View>
         </View>
       ) : (
         <View style={styles.emptyCard}>
-          <Text style={styles.emptyTitle}>No Salary Cycle Established</Text>
+          <Text style={styles.emptyTitle}>No Salary Cycles Yet</Text>
           <Text style={styles.emptySubtitle}>
-            Finly groups your expenses by actual salary receipt dates. Record your first salary to begin personalized cycle tracking.
+            Add your actual salary dates to track spending accurately based on when you get paid.
           </Text>
           <Button
             title="Record First Salary"
             onPress={() => router.push('/salary/new')}
-            variant="primary"
-            size="md"
             style={styles.emptyBtn}
           />
         </View>
       )}
 
-      {/* Cycle Timeline */}
-      {evaluation && evaluation.metricsList.length > 0 && (
+      {/* Timeline of All Cycles */}
+      {evaluation && evaluation.boundaries.length > 0 && (
         <CycleTimeline
           metrics={evaluation.metricsList}
           onDeleteCycle={handleDeleteCycle}
@@ -147,136 +153,137 @@ export default function SalaryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  contentContainer: {
-    padding: spacing.lg,
-    paddingBottom: spacing['4xl'],
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
-  pageTitle: {
-    ...typography.headingMedium,
-    color: colors.textPrimary,
-  },
-  pageSubtitle: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  heroCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.xl,
-    padding: spacing.xl,
-    borderWidth: 1.5,
-    borderColor: colors.primaryLight,
-    ...shadows.floating,
-    marginBottom: spacing.xl,
-  },
-  heroTopRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  activePill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.primaryLight,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
-    borderRadius: radii.full,
-    gap: 6,
-  },
-  pulseDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.primary,
-  },
-  activePillText: {
-    ...typography.bodySmall,
-    fontWeight: '700',
-    color: colors.primary,
-  },
-  elapsedDaysText: {
-    ...typography.bodySmall,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  heroDateRange: {
-    ...typography.bodyMedium,
-    color: colors.textSecondary,
-    marginBottom: spacing.lg,
-  },
-  balanceContainer: {
-    marginBottom: spacing.xl,
-  },
-  balanceLabel: {
-    ...typography.bodyMedium,
-    color: colors.textSecondary,
-    marginBottom: 4,
-  },
-  balanceValue: {
-    ...typography.headingLarge,
-    fontSize: 34,
-    color: colors.primary,
-    fontWeight: '800',
-  },
-  heroStatsGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingTop: spacing.md,
-  },
-  heroStat: {
-    alignItems: 'flex-start',
-  },
-  statLabel: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-    marginBottom: 2,
-  },
-  statValue: {
-    ...typography.bodyMedium,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  statValueExpense: {
-    ...typography.bodyMedium,
-    fontWeight: '700',
-    color: colors.danger,
-  },
-  emptyCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.lg,
-    padding: spacing.xl,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-    marginVertical: spacing.lg,
-  },
-  emptyTitle: {
-    ...typography.headingSmall,
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-  },
-  emptySubtitle: {
-    ...typography.bodyMedium,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
-    lineHeight: 20,
-  },
-  emptyBtn: {
-    minWidth: 180,
-  },
-});
+const getStyles = (colors: ThemeColors, isDark: boolean) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    contentContainer: {
+      padding: spacing.lg,
+      paddingBottom: spacing['4xl'],
+    },
+    headerRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.lg,
+    },
+    pageTitle: {
+      ...typography.headingMedium,
+      color: colors.textPrimary,
+    },
+    pageSubtitle: {
+      ...typography.bodySmall,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    heroCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radii.xl,
+      padding: spacing.xl,
+      borderWidth: 1.5,
+      borderColor: isDark ? colors.borderStrong : colors.primaryLight,
+      ...shadows.floating,
+      marginBottom: spacing.xl,
+    },
+    heroTopRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.sm,
+    },
+    activePill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.primaryLight,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 4,
+      borderRadius: radii.full,
+      gap: 6,
+    },
+    pulseDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: colors.primary,
+    },
+    activePillText: {
+      ...typography.bodySmall,
+      fontWeight: '700',
+      color: isDark ? '#93C5FD' : colors.primary,
+    },
+    elapsedDaysText: {
+      ...typography.bodySmall,
+      fontWeight: '600',
+      color: colors.textSecondary,
+    },
+    heroDateRange: {
+      ...typography.bodyMedium,
+      color: colors.textSecondary,
+      marginBottom: spacing.lg,
+    },
+    balanceContainer: {
+      marginBottom: spacing.xl,
+    },
+    balanceLabel: {
+      ...typography.bodyMedium,
+      color: colors.textSecondary,
+      marginBottom: 4,
+    },
+    balanceValue: {
+      ...typography.headingLarge,
+      fontSize: 34,
+      color: colors.primary,
+      fontWeight: '800',
+    },
+    heroStatsGrid: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      paddingTop: spacing.md,
+    },
+    heroStat: {
+      alignItems: 'flex-start',
+    },
+    statLabel: {
+      ...typography.bodySmall,
+      color: colors.textSecondary,
+      marginBottom: 2,
+    },
+    statValue: {
+      ...typography.bodyMedium,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    statValueExpense: {
+      ...typography.bodyMedium,
+      fontWeight: '700',
+      color: colors.danger,
+    },
+    emptyCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radii.lg,
+      padding: spacing.xl,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: 'center',
+      marginVertical: spacing.lg,
+    },
+    emptyTitle: {
+      ...typography.headingSmall,
+      color: colors.textPrimary,
+      marginBottom: spacing.xs,
+    },
+    emptySubtitle: {
+      ...typography.bodyMedium,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginBottom: spacing.lg,
+      lineHeight: 20,
+    },
+    emptyBtn: {
+      minWidth: 180,
+    },
+  });

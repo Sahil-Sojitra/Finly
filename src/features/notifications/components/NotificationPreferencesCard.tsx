@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, radii, shadows, spacing } from '@/theme';
+import { radii, shadows, spacing, useTheme, ThemeColors } from '@/theme';
 import { NotificationSettings } from '@/domain/insights/insightsTypes';
 
 interface NotificationPreferencesCardProps {
@@ -27,6 +27,8 @@ export function NotificationPreferencesCard({
   onRequestPermissions,
   onSendTestNotification,
 }: NotificationPreferencesCardProps) {
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
   const [isTesting, setIsTesting] = useState(false);
 
   const handleTestNotification = async () => {
@@ -178,109 +180,110 @@ export function NotificationPreferencesCard({
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.xl,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    ...shadows.sm,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  iconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#EFF6FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.sm,
-  },
-  textCol: {
-    flex: 1,
-  },
-  cardTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  cardSubtitle: {
-    fontSize: 11,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  permBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
-  },
-  permBadgeActive: {
-    backgroundColor: '#DCFCE7',
-  },
-  permBadgeInactive: {
-    backgroundColor: '#F1F5F9',
-  },
-  permBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  permTextActive: {
-    color: colors.success,
-  },
-  permTextInactive: {
-    color: colors.textTertiary,
-  },
-  togglesList: {
-    borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
-    paddingTop: spacing.xs,
-  },
-  toggleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
-  },
-  toggleTextCol: {
-    flex: 1,
-    paddingRight: spacing.md,
-  },
-  toggleTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
-  toggleSubtitle: {
-    fontSize: 11,
-    color: colors.textSecondary,
-    lineHeight: 15,
-    marginTop: 2,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#F1F5F9',
-  },
-  testButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#EFF6FF',
-    paddingVertical: 10,
-    borderRadius: radii.md,
-    marginTop: spacing.md,
-    gap: 6,
-    borderWidth: 1,
-    borderColor: '#BFDBFE',
-  },
-  testButtonText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: colors.primary,
-  },
-});
+const getStyles = (colors: ThemeColors, isDark: boolean) =>
+  StyleSheet.create({
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radii.xl,
+      padding: spacing.lg,
+      marginBottom: spacing.md,
+      ...shadows.sm,
+      borderWidth: 1,
+      borderColor: colors.borderLight,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    iconCircle: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: isDark ? colors.surfaceSecondary : '#EFF6FF',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: spacing.sm,
+    },
+    textCol: {
+      flex: 1,
+    },
+    cardTitle: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    cardSubtitle: {
+      fontSize: 11,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    permBadge: {
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      borderRadius: 10,
+    },
+    permBadgeActive: {
+      backgroundColor: isDark ? 'rgba(34, 197, 94, 0.2)' : '#DCFCE7',
+    },
+    permBadgeInactive: {
+      backgroundColor: isDark ? colors.surfaceSecondary : '#F1F5F9',
+    },
+    permBadgeText: {
+      fontSize: 10,
+      fontWeight: '700',
+    },
+    permTextActive: {
+      color: colors.success,
+    },
+    permTextInactive: {
+      color: colors.textTertiary,
+    },
+    togglesList: {
+      borderTopWidth: 1,
+      borderTopColor: colors.borderLight,
+      paddingTop: spacing.xs,
+    },
+    toggleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingVertical: 10,
+    },
+    toggleTextCol: {
+      flex: 1,
+      paddingRight: spacing.md,
+    },
+    toggleTitle: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.textPrimary,
+    },
+    toggleSubtitle: {
+      fontSize: 11,
+      color: colors.textSecondary,
+      lineHeight: 15,
+      marginTop: 2,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: colors.borderLight,
+    },
+    testButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: isDark ? colors.surfaceSecondary : '#EFF6FF',
+      paddingVertical: 10,
+      borderRadius: radii.md,
+      marginTop: spacing.md,
+      gap: 6,
+      borderWidth: 1,
+      borderColor: isDark ? colors.border : '#BFDBFE',
+    },
+    testButtonText: {
+      fontSize: 12,
+      fontWeight: '700',
+      color: colors.primary,
+    },
+  });

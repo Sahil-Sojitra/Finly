@@ -1,7 +1,8 @@
+import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { CycleComparison } from '@/domain/analyticsEngine';
 import { formatPaiseToInr } from '@/utils';
-import { colors, radii, shadows, spacing, typography } from '@/theme';
+import { radii, shadows, spacing, typography, useTheme, ThemeColors } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 
 interface CycleComparisonCardProps {
@@ -9,6 +10,9 @@ interface CycleComparisonCardProps {
 }
 
 export function CycleComparisonCard({ comparison }: CycleComparisonCardProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => getStyles(colors), [colors]);
+
   if (!comparison.hasComparison) {
     return null; // Only render when at least 2 cycles exist to compare
   }
@@ -87,81 +91,82 @@ export function CycleComparisonCard({ comparison }: CycleComparisonCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.xl,
-    padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadows.sm,
-    marginVertical: spacing.sm,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  titleWithIcon: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  title: {
-    ...typography.headingSmall,
-    color: colors.textPrimary,
-  },
-  metricsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: spacing.md,
-    marginBottom: spacing.md,
-  },
-  metricBlock: {
-    flex: 1,
-    backgroundColor: colors.surfaceSecondary,
-    padding: spacing.md,
-    borderRadius: radii.lg,
-  },
-  metricLabel: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginBottom: 4,
-    fontWeight: '500',
-  },
-  valueRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginBottom: 2,
-  },
-  metricValue: {
-    ...typography.bodyMedium,
-    fontWeight: '700',
-  },
-  subText: {
-    ...typography.caption,
-    color: colors.textTertiary,
-  },
-  dailyCompareBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: colors.surfaceSecondary,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radii.md,
-  },
-  dailyCompareLabel: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
-  dailyCompareValue: {
-    ...typography.caption,
-    color: colors.textPrimary,
-  },
-  boldText: {
-    fontWeight: '700',
-  },
-});
+const getStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: colors.surface,
+      borderRadius: radii.xl,
+      padding: spacing.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...shadows.sm,
+      marginVertical: spacing.sm,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    titleWithIcon: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+    },
+    title: {
+      ...typography.headingSmall,
+      color: colors.textPrimary,
+    },
+    metricsRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      gap: spacing.md,
+      marginBottom: spacing.md,
+    },
+    metricBlock: {
+      flex: 1,
+      backgroundColor: colors.surfaceSecondary,
+      padding: spacing.md,
+      borderRadius: radii.lg,
+    },
+    metricLabel: {
+      ...typography.caption,
+      color: colors.textSecondary,
+      marginBottom: 4,
+      fontWeight: '500',
+    },
+    valueRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      marginBottom: 2,
+    },
+    metricValue: {
+      ...typography.bodyMedium,
+      fontWeight: '700',
+    },
+    subText: {
+      ...typography.caption,
+      color: colors.textTertiary,
+    },
+    dailyCompareBar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: colors.surfaceSecondary,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderRadius: radii.md,
+    },
+    dailyCompareLabel: {
+      ...typography.caption,
+      color: colors.textSecondary,
+      fontWeight: '600',
+    },
+    dailyCompareValue: {
+      ...typography.caption,
+      color: colors.textPrimary,
+    },
+    boldText: {
+      fontWeight: '700',
+    },
+  });

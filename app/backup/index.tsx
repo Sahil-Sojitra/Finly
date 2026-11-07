@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,7 +11,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing } from '@/theme';
+import { spacing, useTheme, ThemeColors } from '@/theme';
 import { useBackupStore } from '@/store';
 import {
   GoogleConnectCard,
@@ -26,6 +26,8 @@ import { DriveBackupItem } from '@/domain/backup/backupTypes';
 export default function BackupScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const [isPassphraseModalOpen, setIsPassphraseModalOpen] = useState(false);
   const [selectedBackupForRestore, setSelectedBackupForRestore] =
     useState<DriveBackupItem | null>(null);
@@ -201,37 +203,38 @@ export default function BackupScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  screenWrapper: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  headerBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.sm,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
-  },
-  backButton: {
-    padding: spacing.xs,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  headerRightSpacer: {
-    width: 32,
-  },
-  container: {
-    flex: 1,
-  },
-  contentContainer: {
-    padding: spacing.md,
-    paddingBottom: 40,
-  },
-});
+const getStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    screenWrapper: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    headerBar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.md,
+      paddingBottom: spacing.sm,
+      backgroundColor: colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.borderLight,
+    },
+    backButton: {
+      padding: spacing.xs,
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    headerRightSpacer: {
+      width: 32,
+    },
+    container: {
+      flex: 1,
+    },
+    contentContainer: {
+      padding: spacing.md,
+      paddingBottom: 40,
+    },
+  });

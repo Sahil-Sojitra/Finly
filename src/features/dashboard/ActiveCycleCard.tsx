@@ -1,10 +1,11 @@
+import { useMemo } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FinancialSummary } from '@/domain/analyticsEngine';
 import { CycleBoundary } from '@/domain/salaryCycleEngine';
 import { formatDisplayDate } from '@/domain/dateUtils';
 import { formatPaiseToInr } from '@/utils';
-import { colors, radii, shadows, spacing, typography } from '@/theme';
+import { radii, shadows, spacing, typography, useTheme, ThemeColors } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 
 interface ActiveCycleCardProps {
@@ -14,6 +15,8 @@ interface ActiveCycleCardProps {
 
 export function ActiveCycleCard({ summary, activeCycle }: ActiveCycleCardProps) {
   const router = useRouter();
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
 
   if (!activeCycle || !summary.hasActiveCycle) {
     return (
@@ -102,13 +105,23 @@ export function ActiveCycleCard({ summary, activeCycle }: ActiveCycleCardProps) 
         </View>
 
         <View style={styles.detailItem}>
-          <Ionicons name="hourglass-outline" size={16} color={colors.textSecondary} />
+          <Ionicons name="calendar-clear-outline" size={16} color={colors.textSecondary} />
           <View style={styles.detailTextWrapper}>
-            <Text style={styles.detailLabel}>Expected Next</Text>
+            <Text style={styles.detailLabel}>Next Expected Payday</Text>
             <Text style={styles.detailValue}>
               {activeCycle.expectedNextDate
                 ? formatDisplayDate(activeCycle.expectedNextDate)
-                : 'Not set'}
+                : 'Not Set'}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.detailItem}>
+          <Ionicons name="repeat-outline" size={16} color={colors.textSecondary} />
+          <View style={styles.detailTextWrapper}>
+            <Text style={styles.detailLabel}>Opening Balance</Text>
+            <Text style={styles.detailValue}>
+              {formatPaiseToInr(activeCycle.openingBalance)}
             </Text>
           </View>
         </View>
@@ -122,178 +135,169 @@ export function ActiveCycleCard({ summary, activeCycle }: ActiveCycleCardProps) 
             </Text>
           </View>
         </View>
-
-        <View style={styles.detailItem}>
-          <Ionicons name="layers-outline" size={16} color={colors.textSecondary} />
-          <View style={styles.detailTextWrapper}>
-            <Text style={styles.detailLabel}>Carry-Forward</Text>
-            <Text style={styles.detailValue}>
-              {formatPaiseToInr(summary.openingBalancePaise)}
-            </Text>
-          </View>
-        </View>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.xl,
-    padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadows.sm,
-    marginVertical: spacing.sm,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#DCFCE7',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
-    borderRadius: radii.full,
-    gap: 6,
-  },
-  pulseDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.success,
-  },
-  badgeText: {
-    ...typography.caption,
-    color: '#15803D',
-    fontWeight: '700',
-  },
-  periodText: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    fontWeight: '500',
-  },
-  mainMetricsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-    marginBottom: spacing.md,
-  },
-  metricLabel: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginBottom: 2,
-  },
-  balanceValue: {
-    ...typography.headingLarge,
-    color: colors.textPrimary,
-    fontWeight: '800',
-  },
-  salaryRight: {
-    alignItems: 'flex-end',
-  },
-  salaryValue: {
-    ...typography.headingSmall,
-    color: colors.primary,
-    fontWeight: '700',
-  },
-  progressContainer: {
-    marginBottom: spacing.lg,
-  },
-  progressTrack: {
-    height: 8,
-    backgroundColor: colors.surfaceSecondary,
-    borderRadius: radii.full,
-    overflow: 'hidden',
-    marginBottom: 6,
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: colors.primary,
-    borderRadius: radii.full,
-  },
-  progressLabels: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  progressText: {
-    ...typography.caption,
-    color: colors.textTertiary,
-  },
-  detailsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.md,
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
-  },
-  detailItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '47%',
-    gap: spacing.sm,
-  },
-  detailTextWrapper: {
-    flex: 1,
-  },
-  detailLabel: {
-    ...typography.caption,
-    color: colors.textTertiary,
-  },
-  detailValue: {
-    ...typography.bodyMedium,
-    color: colors.textPrimary,
-    fontWeight: '600',
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    paddingVertical: spacing.xl,
-    backgroundColor: '#FFFBEB',
-    borderColor: '#FDE68A',
-  },
-  emptyIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#FEF3C7',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  emptyContent: {
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  emptyTitle: {
-    ...typography.headingSmall,
-    color: '#92400E',
-    marginBottom: spacing.xs,
-  },
-  emptySubtitle: {
-    ...typography.bodyMedium,
-    color: '#B45309',
-    textAlign: 'center',
-    lineHeight: 20,
-    maxWidth: 320,
-  },
-  recordButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.primary,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm + 2,
-    borderRadius: radii.full,
-    gap: spacing.xs,
-  },
-  recordButtonText: {
-    ...typography.bodyMedium,
-    color: '#FFFFFF',
-    fontWeight: '700',
-  },
-});
+const getStyles = (colors: ThemeColors, isDark: boolean) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: colors.surface,
+      borderRadius: radii.xl,
+      padding: spacing.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginVertical: spacing.sm,
+      ...shadows.card,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    badge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.primaryLight,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 4,
+      borderRadius: radii.full,
+      gap: 6,
+    },
+    pulseDot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: colors.primary,
+    },
+    badgeText: {
+      ...typography.caption,
+      fontWeight: '700',
+      color: isDark ? '#93C5FD' : colors.primaryDark,
+    },
+    periodText: {
+      ...typography.caption,
+      color: colors.textSecondary,
+      fontWeight: '500',
+    },
+    mainMetricsRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: spacing.md,
+    },
+    metricLabel: {
+      ...typography.caption,
+      color: colors.textSecondary,
+      marginBottom: 2,
+    },
+    balanceValue: {
+      ...typography.headingLarge,
+      color: colors.textPrimary,
+      fontWeight: '800',
+    },
+    salaryRight: {
+      alignItems: 'flex-end',
+    },
+    salaryValue: {
+      ...typography.headingSmall,
+      color: colors.primary,
+      fontWeight: '700',
+    },
+    progressContainer: {
+      marginBottom: spacing.lg,
+    },
+    progressTrack: {
+      height: 8,
+      backgroundColor: colors.surfaceSecondary,
+      borderRadius: radii.full,
+      overflow: 'hidden',
+      marginBottom: 6,
+    },
+    progressFill: {
+      height: '100%',
+      backgroundColor: colors.primary,
+      borderRadius: radii.full,
+    },
+    progressLabels: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    progressText: {
+      ...typography.caption,
+      color: colors.textTertiary,
+    },
+    detailsGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.md,
+      paddingTop: spacing.md,
+      borderTopWidth: 1,
+      borderTopColor: colors.borderLight,
+    },
+    detailItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      width: '47%',
+      gap: spacing.sm,
+    },
+    detailTextWrapper: {
+      flex: 1,
+    },
+    detailLabel: {
+      ...typography.caption,
+      color: colors.textTertiary,
+    },
+    detailValue: {
+      ...typography.bodyMedium,
+      color: colors.textPrimary,
+      fontWeight: '600',
+    },
+    emptyContainer: {
+      alignItems: 'center',
+      paddingVertical: spacing.xl,
+      backgroundColor: isDark ? colors.surface : '#FFFBEB',
+      borderColor: isDark ? colors.border : '#FDE68A',
+    },
+    emptyIconContainer: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: isDark ? colors.surfaceSecondary : '#FEF3C7',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    emptyContent: {
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    emptyTitle: {
+      ...typography.headingSmall,
+      color: isDark ? colors.warning : '#92400E',
+      marginBottom: spacing.xs,
+    },
+    emptySubtitle: {
+      ...typography.bodyMedium,
+      color: isDark ? colors.textSecondary : '#B45309',
+      textAlign: 'center',
+      lineHeight: 20,
+      maxWidth: 320,
+    },
+    recordButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.primary,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm + 2,
+      borderRadius: radii.full,
+      gap: spacing.xs,
+    },
+    recordButtonText: {
+      ...typography.bodyMedium,
+      color: '#FFFFFF',
+      fontWeight: '700',
+    },
+  });

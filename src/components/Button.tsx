@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -6,7 +7,7 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
-import { colors, radii, spacing, typography } from '@/theme';
+import { radii, spacing, typography, useTheme, ThemeColors } from '@/theme';
 
 export interface ButtonProps {
   title: string;
@@ -29,6 +30,8 @@ export function Button({
   fullWidth = false,
   style,
 }: ButtonProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const isInteractive = !disabled && !loading;
 
   const containerStyle: ViewStyle[] = [
@@ -69,96 +72,96 @@ export function Button({
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: radii.md,
-    minHeight: 44, // Accessible touch target
-  },
-  fullWidth: {
-    width: '100%',
-  },
-  pressed: {
-    opacity: 0.85,
-    transform: [{ scale: 0.99 }],
-  },
-  disabled: {
-    opacity: 0.5,
-  },
+const getStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    base: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: radii.md,
+      minHeight: 44,
+    },
+    fullWidth: {
+      width: '100%',
+    },
+    pressed: {
+      opacity: 0.85,
+      transform: [{ scale: 0.99 }],
+    },
+    disabled: {
+      opacity: 0.5,
+    },
 
-  // Sizes
-  sm: {
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.md,
-    minHeight: 36,
-  },
-  md: {
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-    minHeight: 48,
-  },
-  lg: {
-    paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.xl,
-    minHeight: 56,
-  },
+    // Sizes
+    sm: {
+      paddingVertical: spacing.xs,
+      paddingHorizontal: spacing.md,
+      minHeight: 36,
+    },
+    md: {
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.lg,
+      minHeight: 48,
+    },
+    lg: {
+      paddingVertical: spacing.lg,
+      paddingHorizontal: spacing.xl,
+      minHeight: 56,
+    },
 
-  // Variants
-  primary: {
-    backgroundColor: colors.primary,
-  },
-  secondary: {
-    backgroundColor: colors.surfaceMuted,
-  },
-  outline: {
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: colors.borderStrong,
-  },
-  danger: {
-    backgroundColor: colors.danger,
-  },
-  ghost: {
-    backgroundColor: 'transparent',
-  },
+    // Variants
+    primary: {
+      backgroundColor: colors.primary,
+    },
+    secondary: {
+      backgroundColor: colors.surfaceMuted,
+    },
+    outline: {
+      backgroundColor: 'transparent',
+      borderWidth: 1.5,
+      borderColor: colors.borderStrong,
+    },
+    danger: {
+      backgroundColor: colors.danger,
+    },
+    ghost: {
+      backgroundColor: 'transparent',
+    },
 
-  // Text
-  textBase: {
-    textAlign: 'center',
-    fontWeight: '600',
-  },
-  smText: {
-    ...typography.bodySmall,
-    fontWeight: '600',
-  },
-  mdText: {
-    ...typography.bodyMedium,
-    fontWeight: '600',
-  },
-  lgText: {
-    ...typography.bodyLarge,
-    fontWeight: '600',
-  },
+    // Text
+    textBase: {
+      textAlign: 'center',
+      fontWeight: '600',
+    },
+    smText: {
+      ...typography.bodySmall,
+      fontWeight: '600',
+    },
+    mdText: {
+      ...typography.bodyMedium,
+      fontWeight: '600',
+    },
+    lgText: {
+      ...typography.bodyLarge,
+      fontWeight: '600',
+    },
 
-  primaryText: {
-    color: colors.textInverse,
-  },
-  secondaryText: {
-    color: colors.textPrimary,
-  },
-  outlineText: {
-    color: colors.textPrimary,
-  },
-  dangerText: {
-    color: colors.textInverse,
-  },
-  ghostText: {
-    color: colors.primary,
-  },
-  disabledText: {
-    color: colors.textMuted,
-  },
-});
-
+    primaryText: {
+      color: '#FFFFFF',
+    },
+    secondaryText: {
+      color: colors.textPrimary,
+    },
+    outlineText: {
+      color: colors.textPrimary,
+    },
+    dangerText: {
+      color: '#FFFFFF',
+    },
+    ghostText: {
+      color: colors.primary,
+    },
+    disabledText: {
+      color: colors.textMuted,
+    },
+  });

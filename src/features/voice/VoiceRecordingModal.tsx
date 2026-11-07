@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import {
   Modal,
   StyleSheet,
@@ -16,7 +16,7 @@ import { VoiceTransactionParser, ParsedVoiceCommand } from '@/domain/voiceParser
 import { useCategoryStore, useTransactionStore, useSalaryCycleStore } from '@/store';
 import { DEFAULT_CATEGORIES } from '@/database/seeds/defaultCategories';
 import { parseInrToPaise } from '@/utils';
-import { colors, radii, shadows, spacing, typography } from '@/theme';
+import { radii, shadows, spacing, typography, useTheme, ThemeColors } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import * as Crypto from 'expo-crypto';
 import { TransactionType } from '@/types';
@@ -34,6 +34,8 @@ export function VoiceRecordingModal({
   onClose,
   onSuccess,
 }: VoiceRecordingModalProps) {
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [transcript, setTranscript] = useState('');
   const [parsed, setParsed] = useState<ParsedVoiceCommand | null>(null);
@@ -475,191 +477,192 @@ export function VoiceRecordingModal({
   );
 }
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.6)',
-    justifyContent: 'flex-end',
-  },
-  sheetContainer: {
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: radii.xl,
-    borderTopRightRadius: radii.xl,
-    padding: spacing.lg,
-    maxHeight: '90%',
-    ...shadows.lg,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-    paddingBottom: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
-  },
-  headerTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  micIconBox: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.primaryLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  sheetTitle: {
-    ...typography.headingSmall,
-    color: colors.textPrimary,
-  },
-  listeningContainer: {
-    alignItems: 'center',
-    paddingVertical: spacing.xl,
-  },
-  pulsingRing: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: colors.primaryLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
-  innerMicCircle: {
-    width: 68,
-    height: 68,
-    borderRadius: 34,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  listeningPrompt: {
-    ...typography.headingSmall,
-    color: colors.textPrimary,
-    marginBottom: 4,
-  },
-  listeningHint: {
-    ...typography.bodyMedium,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
-  },
-  liveTranscriptBox: {
-    backgroundColor: colors.surfaceSecondary,
-    borderRadius: radii.lg,
-    padding: spacing.md,
-    width: '100%',
-    marginBottom: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  liveTranscriptText: {
-    ...typography.bodyLarge,
-    fontStyle: 'italic',
-    color: colors.textPrimary,
-    textAlign: 'center',
-  },
-  actionRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    width: '100%',
-    marginBottom: spacing.lg,
-  },
-  modalButton: {
-    flex: 1,
-    paddingVertical: spacing.md,
-    borderRadius: radii.lg,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 6,
-  },
-  stopButton: {
-    backgroundColor: colors.primary,
-  },
-  stopButtonText: {
-    ...typography.bodyMedium,
-    color: '#FFFFFF',
-    fontWeight: '700',
-  },
-  cancelButton: {
-    backgroundColor: colors.surfaceSecondary,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  cancelButtonText: {
-    ...typography.bodyMedium,
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
-  sampleChipsContainer: {
-    width: '100%',
-    paddingTop: spacing.sm,
-  },
-  sampleSectionTitle: {
-    ...typography.caption,
-    color: colors.textTertiary,
-    marginBottom: spacing.xs,
-  },
-  chipsScroll: {
-    gap: spacing.xs,
-  },
-  sampleChip: {
-    backgroundColor: colors.surfaceSecondary,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 6,
-    borderRadius: radii.full,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  sampleChipText: {
-    ...typography.caption,
-    color: colors.textSecondary,
-  },
-  processingContainer: {
-    alignItems: 'center',
-    paddingVertical: spacing.xxl,
-    gap: spacing.md,
-  },
-  processingText: {
-    ...typography.bodyMedium,
-    color: colors.textSecondary,
-  },
-  confirmScroll: {
-    maxHeight: 480,
-  },
-  quoteBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.primaryLight,
-    padding: spacing.md,
-    borderRadius: radii.lg,
-    gap: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  quoteText: {
-    ...typography.bodyMedium,
-    color: colors.primaryDark,
-    fontStyle: 'italic',
-    flex: 1,
-  },
-  warningBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FEF3C7',
-    padding: spacing.sm,
-    borderRadius: radii.md,
-    gap: spacing.xs,
-    marginBottom: spacing.md,
-  },
-  warningText: {
-    ...typography.caption,
-    color: '#92400E',
-    flex: 1,
-  },
+const getStyles = (colors: ThemeColors, isDark: boolean) =>
+  StyleSheet.create({
+    overlay: {
+      flex: 1,
+      backgroundColor: 'rgba(15, 23, 42, 0.6)',
+      justifyContent: 'flex-end',
+    },
+    sheetContainer: {
+      backgroundColor: colors.surface,
+      borderTopLeftRadius: radii.xl,
+      borderTopRightRadius: radii.xl,
+      padding: spacing.lg,
+      maxHeight: '90%',
+      ...shadows.lg,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+      paddingBottom: spacing.sm,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.borderLight,
+    },
+    headerTitleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    micIconBox: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: colors.primaryLight,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    sheetTitle: {
+      ...typography.headingSmall,
+      color: colors.textPrimary,
+    },
+    listeningContainer: {
+      alignItems: 'center',
+      paddingVertical: spacing.xl,
+    },
+    pulsingRing: {
+      width: 96,
+      height: 96,
+      borderRadius: 48,
+      backgroundColor: colors.primaryLight,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: spacing.lg,
+    },
+    innerMicCircle: {
+      width: 68,
+      height: 68,
+      borderRadius: 34,
+      backgroundColor: colors.primary,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    listeningPrompt: {
+      ...typography.headingSmall,
+      color: colors.textPrimary,
+      marginBottom: 4,
+    },
+    listeningHint: {
+      ...typography.bodyMedium,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginBottom: spacing.lg,
+    },
+    liveTranscriptBox: {
+      backgroundColor: colors.surfaceSecondary,
+      borderRadius: radii.lg,
+      padding: spacing.md,
+      width: '100%',
+      marginBottom: spacing.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    liveTranscriptText: {
+      ...typography.bodyLarge,
+      fontStyle: 'italic',
+      color: colors.textPrimary,
+      textAlign: 'center',
+    },
+    actionRow: {
+      flexDirection: 'row',
+      gap: spacing.md,
+      width: '100%',
+      marginBottom: spacing.lg,
+    },
+    modalButton: {
+      flex: 1,
+      paddingVertical: spacing.md,
+      borderRadius: radii.lg,
+      justifyContent: 'center',
+      alignItems: 'center',
+      flexDirection: 'row',
+      gap: 6,
+    },
+    stopButton: {
+      backgroundColor: colors.primary,
+    },
+    stopButtonText: {
+      ...typography.bodyMedium,
+      color: '#FFFFFF',
+      fontWeight: '700',
+    },
+    cancelButton: {
+      backgroundColor: colors.surfaceSecondary,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    cancelButtonText: {
+      ...typography.bodyMedium,
+      color: colors.textSecondary,
+      fontWeight: '600',
+    },
+    sampleChipsContainer: {
+      width: '100%',
+      paddingTop: spacing.sm,
+    },
+    sampleSectionTitle: {
+      ...typography.caption,
+      color: colors.textTertiary,
+      marginBottom: spacing.xs,
+    },
+    chipsScroll: {
+      gap: spacing.xs,
+    },
+    sampleChip: {
+      backgroundColor: colors.surfaceSecondary,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 6,
+      borderRadius: radii.full,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    sampleChipText: {
+      ...typography.caption,
+      color: colors.textSecondary,
+    },
+    processingContainer: {
+      alignItems: 'center',
+      paddingVertical: spacing.xxl,
+      gap: spacing.md,
+    },
+    processingText: {
+      ...typography.bodyMedium,
+      color: colors.textSecondary,
+    },
+    confirmScroll: {
+      maxHeight: 480,
+    },
+    quoteBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: isDark ? colors.surfaceSecondary : colors.primaryLight,
+      padding: spacing.md,
+      borderRadius: radii.lg,
+      gap: spacing.sm,
+      marginBottom: spacing.md,
+    },
+    quoteText: {
+      ...typography.bodyMedium,
+      color: isDark ? colors.textPrimary : colors.primaryDark,
+      fontStyle: 'italic',
+      flex: 1,
+    },
+    warningBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: isDark ? 'rgba(251, 191, 36, 0.2)' : '#FEF3C7',
+      padding: spacing.sm,
+      borderRadius: radii.md,
+      gap: spacing.xs,
+      marginBottom: spacing.md,
+    },
+    warningText: {
+      ...typography.caption,
+      color: isDark ? colors.warning : '#92400E',
+      flex: 1,
+    },
   typeToggleRow: {
     flexDirection: 'row',
     gap: spacing.md,
