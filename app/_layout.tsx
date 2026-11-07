@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import { AppState } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { initializeDatabase } from '@/database';
+import { WidgetService } from '@/services';
 import { colors } from '@/theme';
 
 // Prevent splash screen from auto-hiding before initialization completes
@@ -17,6 +19,8 @@ export default function RootLayout() {
       try {
         await initializeDatabase();
         setDbReady(true);
+        // Synchronize widget snapshot on startup
+        WidgetService.syncFromDatabase().catch(() => {});
       } catch (e) {
         console.warn('Database initialization warning:', e);
         setDbReady(true);
@@ -27,6 +31,17 @@ export default function RootLayout() {
 
     prepare();
   }, []);
+
+  // Synchronize widget snapshot whenever app transitions to background
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (nextState === 'background' || nextState === 'inactive') {
+        WidgetService.syncFromDatabase().catch(() => {});
+      }
+    });
+    return () => subscription.remove();
+  }, []);
+
 
   if (!dbReady) {
     return null;
