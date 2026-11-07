@@ -68,6 +68,20 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="insights"
+        options={{
+          title: 'Insights',
+          headerTitle: 'Spending Insights',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'bulb' : 'bulb-outline'}
+              size={22}
+              color={color as string}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',
