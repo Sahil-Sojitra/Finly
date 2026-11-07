@@ -55,10 +55,23 @@ export class InsightsEngine {
         if (existing) {
           existing.amount += tx.amount;
         } else {
+          const catName =
+            tx.category?.name ??
+            (tx as unknown as { categoryName?: string }).categoryName ??
+            'Other';
+          const catIcon =
+            tx.category?.icon ??
+            (tx as unknown as { categoryIcon?: string }).categoryIcon ??
+            'cart';
+          const catColor =
+            tx.category?.color ??
+            (tx as unknown as { categoryColor?: string }).categoryColor ??
+            '#64748B';
+
           categorySpendMap.set(tx.categoryId, {
-            name: tx.category.name,
-            icon: tx.category.icon,
-            color: tx.category.color,
+            name: catName,
+            icon: catIcon,
+            color: catColor,
             amount: tx.amount,
           });
         }
@@ -215,7 +228,10 @@ export class InsightsEngine {
           description: `${formatPaiseToInr(tx.amount)} is over 2.5× your average daily spending.`,
           amountPaise: tx.amount,
           formattedAmount: formatPaiseToInr(tx.amount),
-          categoryName: tx.category.name,
+          categoryName:
+            tx.category?.name ??
+            (tx as unknown as { categoryName?: string }).categoryName ??
+            'General',
           date: tx.transactionDate,
         });
       }
