@@ -42,6 +42,21 @@
           "microphonePermission": "Finly needs access to your microphone to record voice expenses.",
           "speechRecognitionPermission": "Finly uses speech recognition to transcribe natural language expense and income commands."
         }
+      ],
+      [
+        "expo-widgets",
+        {
+          "enableAndroid": true,
+          "groupIdentifier": "group.com.finly.app",
+          "widgets": [
+            {
+              "name": "FinlyWidget",
+              "displayName": "Finly Cycle & Balance",
+              "description": "Track available balance and salary cycle progress on your home screen",
+              "supportedFamilies": ["systemSmall", "systemMedium"]
+            }
+          ]
+        }
       ]
     ],
     "experiments": {
