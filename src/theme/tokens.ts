@@ -20,15 +20,21 @@ export const colors = {
   background: '#F8FAFC',
   surface: '#FFFFFF',
   surfaceMuted: '#F1F5F9',
+  surfaceSecondary: '#F1F5F9',
   surfaceSubtle: '#F8FAFC',
 
   textPrimary: '#0F172A',
   textSecondary: '#64748B',
   textMuted: '#94A3B8',
+  textTertiary: '#94A3B8',
   textInverse: '#FFFFFF',
 
+  accent: '#6366F1',
+
   border: '#E2E8F0',
+  borderLight: '#F1F5F9',
   borderStrong: '#CBD5E1',
+
 
   overlay: 'rgba(15, 23, 42, 0.4)',
 } as const;
@@ -53,6 +59,12 @@ export const radii = {
 } as const;
 
 export const typography = {
+  hero: {
+    fontSize: 32,
+    lineHeight: 38,
+    fontWeight: '800' as const,
+    color: colors.textPrimary,
+  },
   headingLarge: {
     fontSize: 28,
     lineHeight: 34,
@@ -89,6 +101,12 @@ export const typography = {
     fontWeight: '400' as const,
     color: colors.textSecondary,
   },
+  caption: {
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '500' as const,
+    color: colors.textSecondary,
+  },
   monoLarge: {
     fontSize: 24,
     lineHeight: 30,
@@ -99,6 +117,27 @@ export const typography = {
 } as const;
 
 export const shadows = {
+  sm: {
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  md: {
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  lg: {
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    elevation: 6,
+  },
   card: {
     shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 2 },
@@ -113,5 +152,6 @@ export const shadows = {
     shadowRadius: 16,
     elevation: 6,
   },
+
 } as const;
 
