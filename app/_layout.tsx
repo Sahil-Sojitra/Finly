@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AppState } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -19,10 +19,11 @@ export default function RootLayout() {
       try {
         await initializeDatabase();
         setDbReady(true);
-        // Synchronize widget snapshot on startup
-        WidgetService.syncFromDatabase().catch(() => {});
-        // Check and trigger scheduled backup in the background
-        BackupService.checkAndRunScheduledBackup().catch(() => {});
+        // Synchronize widget snapshot on startup (native mobile only)
+        if (Platform.OS !== 'web') {
+          WidgetService.syncFromDatabase().catch(() => {});
+          BackupService.checkAndRunScheduledBackup().catch(() => {});
+        }
       } catch (e) {
         console.warn('Database initialization warning:', e);
         setDbReady(true);

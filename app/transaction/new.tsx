@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useCategoryStore, useTransactionStore, useSalaryCycleStore } from '@/store';
@@ -87,8 +89,15 @@ export default function NewTransactionScreen() {
   };
 
   return (
-    <View style={styles.screenWrapper}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <KeyboardAvoidingView
+      style={styles.screenWrapper}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Prominent Voice Entry Trigger Card */}
         <TouchableOpacity
           style={styles.voicePromptCard}
@@ -258,7 +267,7 @@ export default function NewTransactionScreen() {
         onClose={() => setIsVoiceModalOpen(false)}
         onSuccess={() => router.back()}
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

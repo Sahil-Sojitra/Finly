@@ -9,6 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing } from '@/theme';
 import { useBackupStore } from '@/store';
@@ -24,6 +25,7 @@ import { DriveBackupItem } from '@/domain/backup/backupTypes';
 
 export default function BackupScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [isPassphraseModalOpen, setIsPassphraseModalOpen] = useState(false);
   const [selectedBackupForRestore, setSelectedBackupForRestore] =
     useState<DriveBackupItem | null>(null);
@@ -110,7 +112,12 @@ export default function BackupScreen() {
   return (
     <View style={styles.screenWrapper}>
       {/* Header */}
-      <View style={styles.headerBar}>
+      <View
+        style={[
+          styles.headerBar,
+          { paddingTop: Math.max(insets.top, 16) + spacing.xs },
+        ]}
+      >
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
@@ -204,7 +211,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
-    paddingTop: 54,
     paddingBottom: spacing.sm,
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
