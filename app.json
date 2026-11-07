@@ -53,11 +53,15 @@
               "name": "FinlyWidget",
               "displayName": "Finly Cycle & Balance",
               "description": "Track available balance and salary cycle progress on your home screen",
-              "supportedFamilies": ["systemSmall", "systemMedium"]
+              "supportedFamilies": [
+                "systemSmall",
+                "systemMedium"
+              ]
             }
           ]
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
