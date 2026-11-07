@@ -1,12 +1,13 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const backupMetadata = sqliteTable('backup_metadata', {
   id: text('id').primaryKey(),
-  backupDate: text('backup_date').notNull(),
-  checksum: text('checksum').notNull(),
-  sizeBytes: integer('size_bytes').notNull(),
-  remoteFileId: text('remote_file_id'),
-  status: text('status').notNull().$type<'success' | 'failed'>(),
+  provider: text('provider').notNull(),
+  lastBackupAt: text('last_backup_at').notNull(),
+  backupVersion: text('backup_version').notNull(),
+  status: text('status').notNull().$type<'success' | 'failed' | 'pending'>(),
+  remoteBackupId: text('remote_backup_id'),
+  createdAt: text('created_at').notNull(),
 });
 
 export type BackupMetadataRow = typeof backupMetadata.$inferSelect;

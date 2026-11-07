@@ -8,47 +8,48 @@
  */
 export type Paise = number;
 
-export type TransactionType = 'expense' | 'income' | 'carry_forward';
+export type TransactionType = 'income' | 'expense';
 
-export type PaymentMode = 'upi' | 'card' | 'cash' | 'netbanking' | 'other';
+export type InputMethod = 'manual' | 'voice';
 
-export type SalaryCycleStatus = 'active' | 'closed';
+export type BackupStatus = 'success' | 'failed' | 'pending';
 
 export interface Category {
   id: string;
   name: string;
+  type: TransactionType;
   icon: string;
   color: string;
-  type: 'expense' | 'income';
   isDefault: boolean;
   createdAt: string;
-  updatedAt: string;
 }
 
 export interface SalaryCycle {
   id: string;
-  name: string;
-  startDate: string; // ISO 8601 YYYY-MM-DD
-  endDate: string | null; // ISO 8601 YYYY-MM-DD, null if active
-  baseSalaryPaise: Paise;
-  openingBalancePaise: Paise;
-  carryForwardPaise: Paise;
-  status: SalaryCycleStatus;
+  salaryAmount: Paise;
+  receivedDate: string; // ISO 8601 YYYY-MM-DD
+  expectedNextDate: string | null; // ISO 8601 YYYY-MM-DD (nullable)
+  openingBalance: Paise;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface Transaction {
   id: string;
-  salaryCycleId: string | null;
-  categoryId: string;
-  amountPaise: Paise;
+  cycleId: string | null;
   type: TransactionType;
+  amount: Paise;
+  description: string;
+  categoryId: string;
   transactionDate: string; // ISO 8601 YYYY-MM-DD
-  note?: string | null;
-  paymentMode: PaymentMode;
+  inputMethod: InputMethod;
+  notes: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface TransactionWithCategory extends Transaction {
+  category: Category;
 }
 
 export interface AppSetting {
@@ -59,10 +60,10 @@ export interface AppSetting {
 
 export interface BackupMetadata {
   id: string;
-  backupDate: string;
-  checksum: string;
-  sizeBytes: number;
-  remoteFileId: string;
-  status: 'success' | 'failed';
+  provider: string;
+  lastBackupAt: string;
+  backupVersion: string;
+  status: BackupStatus;
+  remoteBackupId: string | null;
+  createdAt: string;
 }
-
