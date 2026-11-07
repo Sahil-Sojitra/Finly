@@ -1,5 +1,5 @@
 /**
- * Core type definitions for MyChoice AI (Finly)
+ * Core type definitions for Finly
  */
 
 /**

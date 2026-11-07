@@ -1,5 +1,5 @@
 /**
- * Finly (MyChoice AI) Design Tokens
+ * Finly Design Tokens
  * Master Theme System
  */
 

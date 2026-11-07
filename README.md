@@ -1,4 +1,4 @@
-# MyChoice AI (Finly)
+# Finly
 
 > **Premium, personal, offline-first expense tracking designed for non-calendar salary cycles.**
 
@@ -18,7 +18,7 @@ Traditional personal finance applications lock spending analysis into calendar-m
 
 ## The Solution
 
-**MyChoice AI (Finly)** models your personal financial periods directly around **actual salary receipt dates**:
+**Finly** models your personal financial periods directly around **actual salary receipt dates**:
 - **Dynamic Salary Cycles**: A cycle starts on the exact date your salary is received and automatically concludes the day before your next salary arrives.
 - **Deterministic Paise Math**: All monetary amounts are recorded in integer paise to eliminate floating-point arithmetic errors.
 - **Offline & Private**: Built on SQLite with zero mandatory backend servers and ₹0 recurring cost.

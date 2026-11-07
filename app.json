@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "MyChoice AI",
-    "slug": "mychoice-ai",
+    "name": "Finly",
+    "slug": "finly",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "mychoiceai",
+    "scheme": "finly",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.mychoiceai.app"
+      "bundleIdentifier": "com.finly.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +19,7 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "package": "com.mychoiceai.app",
+      "package": "com.finly.app",
       "predictiveBackGestureEnabled": false
     },
     "web": {

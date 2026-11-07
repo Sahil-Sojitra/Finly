@@ -1,4 +1,4 @@
--- MyChoice AI Database Migration 0000_init.sql
+-- Finly Database Migration 0000_init.sql
 -- Enforces foreign keys and creates normalized tables and indexes
 
 PRAGMA foreign_keys = ON;

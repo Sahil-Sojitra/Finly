@@ -28,7 +28,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Dashboard',
-          headerTitle: 'MyChoice AI',
+          headerTitle: 'Finly',
         }}
       />
       <Tabs.Screen

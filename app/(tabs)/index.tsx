@@ -7,7 +7,7 @@ export default function DashboardScreen() {
       <View style={styles.card}>
         <Text style={styles.title}>Dashboard Foundation</Text>
         <Text style={styles.subtitle}>
-          MyChoice AI expense tracking initialized. Business screens will be implemented in subsequent approved phases.
+          Finly expense tracking initialized. Business screens will be implemented in subsequent approved phases.
         </Text>
       </View>
     </View>
